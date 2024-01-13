@@ -269,15 +269,15 @@ def flash_buttons():
 
 def build_side_by_side_ui_named(models):
     notice_markdown = """
-# ⚔️  Chatbot Arena ⚔️ : Benchmarking LLMs in the Wild
-| [Blog](https://lmsys.org/blog/2023-05-03-arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2306.05685) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) |
+# ⚔️  繁中 LLM 聊天機器人競技場⚔️ : 野生的大模型測試
+- | [GitHub](https://github.com/MiuLab/Taiwan-LLM) | [X](https://twitter.com/yentinglin56)
 
-## 📜 Rules
-- Chat with any two models side-by-side and vote!
-- You can continue chatting for multiple rounds.
-- Click "Clear history" to start a new round.
+## 📜 規則
+- 與任意兩個模型進行並排對話並進行投票！
+- 您可以進行多輪對話。
+- 點擊「🎲 新一輪」以開始新一輪評測。
 
-## 🤖 Choose two models to compare
+## 🤖 選擇兩個模型進行比較
 """
 
     states = [gr.State() for _ in range(num_sides)]
@@ -298,7 +298,7 @@ def build_side_by_side_ui_named(models):
                         container=False,
                     )
         with gr.Row():
-            with gr.Accordion("🔍 Expand to see 20+ model descriptions", open=False):
+            with gr.Accordion("🔍 展開以查看競技場選手", open=False):
                 model_description_md = get_model_description_md(models)
                 gr.Markdown(model_description_md, elem_id="model_description_markdown")
 
@@ -312,38 +312,38 @@ def build_side_by_side_ui_named(models):
 
         with gr.Row():
             leftvote_btn = gr.Button(
-                value="👈  A is better", visible=False, interactive=False
+                value="👈  A表現較佳", visible=False, interactive=False
             )
             rightvote_btn = gr.Button(
-                value="👉  B is better", visible=False, interactive=False
+                value="👉  B表現較佳", visible=False, interactive=False
             )
-            tie_btn = gr.Button(value="🤝  Tie", visible=False, interactive=False)
+            tie_btn = gr.Button(value="🤝  平手", visible=False, interactive=False)
             bothbad_btn = gr.Button(
-                value="👎  Both are bad", visible=False, interactive=False
+                value="👎  兩者皆差", visible=False, interactive=False
             )
 
     with gr.Row():
         textbox = gr.Textbox(
             show_label=False,
-            placeholder="👉 Enter your prompt and press ENTER",
+            placeholder="👉 輸入訊息後按下 ENTER",
             container=False,
             elem_id="input_box",
         )
-        send_btn = gr.Button(value="Send", variant="primary", scale=0)
+        send_btn = gr.Button(value="發送", variant="primary", scale=0)
 
     with gr.Row() as button_row:
-        clear_btn = gr.Button(value="🗑️  Clear history", interactive=False)
-        regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=False)
-        share_btn = gr.Button(value="📷  Share")
+        clear_btn = gr.Button(value="🎲 新一輪", interactive=False)
+        regenerate_btn = gr.Button(value="🔄  重新生成", interactive=False)
+        share_btn = gr.Button(value="📷  分享")
 
-    with gr.Accordion("Parameters", open=False) as parameter_row:
+    with gr.Accordion("生成參數", open=False) as parameter_row:
         temperature = gr.Slider(
             minimum=0.0,
             maximum=1.0,
             value=0.7,
             step=0.1,
             interactive=True,
-            label="Temperature",
+            label="隨機性",
         )
         top_p = gr.Slider(
             minimum=0.0,
@@ -351,7 +351,7 @@ def build_side_by_side_ui_named(models):
             value=1.0,
             step=0.1,
             interactive=True,
-            label="Top P",
+            label="Top P (機率閾值)",
         )
         max_output_tokens = gr.Slider(
             minimum=16,
@@ -359,7 +359,7 @@ def build_side_by_side_ui_named(models):
             value=1024,
             step=64,
             interactive=True,
-            label="Max output tokens",
+            label="最大輸出字數",
         )
 
     gr.Markdown(acknowledgment_md, elem_id="ack_markdown")

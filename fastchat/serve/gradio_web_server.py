@@ -62,12 +62,7 @@ enable_moderation = False
 acknowledgment_md = """
 ### Acknowledgment
 <div class="image-container">
-    <p> We thank <a href="https://www.kaggle.com/" target="_blank">Kaggle</a>, <a href="https://mbzuai.ac.ae/" target="_blank">MBZUAI</a>, <a href="https://www.anyscale.com/" target="_blank">AnyScale</a>, <a href="https://www.a16z.com/" target="_blank">a16z</a>, and <a href="https://huggingface.co/" target="_blank">HuggingFace</a> for their generous <a href="https://lmsys.org/donations/" target="_blank">sponsorship</a>. </p>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Kaggle_logo.png/400px-Kaggle_logo.png" alt="Kaggle">
-    <img src="https://mma.prnewswire.com/media/1227419/MBZUAI_Logo.jpg?p=facebookg" alt="MBZUAI">
-    <img src="https://docs.anyscale.com/site-assets/logo.png" alt="AnyScale">
-    <img src="https://a16z.com/wp-content/themes/a16z/assets/images/opegraph_images/corporate-Yoast-Twitter.jpg" alt="a16z">
-    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo-with-title.png" alt="HuggingFace">
+    <p> We thank <a href="http://lmsys.org/" target="_blank">LMSYS</a> for opensourcing the chatbot arena, which our project has forked to test traditional Chinese LLMs. </p>
 </div>
 """
 
@@ -596,36 +591,21 @@ def get_model_description_md(models):
 
 def build_about():
     about_markdown = f"""
-# About Us
-Chatbot Arena is an open-source research project developed by members from [LMSYS](https://lmsys.org/about/) and UC Berkeley [SkyLab](https://sky.cs.berkeley.edu/).  Our mission is to build an open crowdsourced platform to collect human feedback and evaluate LLMs under real-world scenarios. We open-source our [FastChat](https://github.com/lm-sys/FastChat) project at GitHub and release chat and human feedback datasets [here](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md). We invite everyone to join us in this journey!
-
-## Read More
-- Chatbot Arena [launch post](https://lmsys.org/blog/2023-05-03-arena/), [data release](https://lmsys.org/blog/2023-07-20-dataset/)
-- LMSYS-Chat-1M [report](https://arxiv.org/abs/2309.11998)
+# 關於我們
+繁中 Chatbot Arena 是由 [林彥廷](https://yentingl.com/) 和 [NTU MiuLab](https://www.csie.ntu.edu.tw/~miulab/) 基於 [LMSYS](https://lmsys.org/about/) 的開源研究項目，旨在測試繁體中文大型語言模型（LLM）。我們建立一個開放的測試平台，收集真實世界情境下LLM的表現。
 
 ## Core Members
-[Lianmin Zheng](https://lmzheng.net/), [Wei-Lin Chiang](https://infwinston.github.io/), [Ying Sheng](https://sites.google.com/view/yingsheng/home), [Siyuan Zhuang](https://scholar.google.com/citations?user=KSZmI5EAAAAJ)
+[Yenting Lin](https://yentingl.com/)
 
 ## Advisors
-[Ion Stoica](http://people.eecs.berkeley.edu/~istoica/), [Joseph E. Gonzalez](https://people.eecs.berkeley.edu/~jegonzal/), [Hao Zhang](https://cseweb.ucsd.edu/~haozhang/)
+[Yun-Nung (Vivian) Chen](https://www.csie.ntu.edu.tw/~yvchen/)
 
 ## Contact Us
-- Follow our [Twitter](https://twitter.com/lmsysorg), [Discord](https://discord.gg/HSWAKCrnFx) or email us at lmsys.org@gmail.com
-- File issues on [GitHub](https://github.com/lm-sys/FastChat)
-- Download our datasets and models on [HuggingFace](https://huggingface.co/lmsys)
+- Follow our [X / Twitter](https://twitter.com/yentinglin56) or email us at ytl@ieee.org
+- File issues on [GitHub](https://github.com/MiuLab/Taiwan-LLM)
 
 ## Acknowledgment
-We thank [SkyPilot](https://github.com/skypilot-org/skypilot) and [Gradio](https://github.com/gradio-app/gradio) team for their system support.
-We also thank [Kaggle](https://www.kaggle.com/), [MBZUAI](https://mbzuai.ac.ae/), [Anyscale](https://www.anyscale.com/), [a16z](https://www.a16z.com/), [HuggingFace](https://huggingface.co/) for their generous sponsorship.
-Learn more about partnership [here](https://lmsys.org/donations/).
-
-<div class="image-about">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Kaggle_logo.png/400px-Kaggle_logo.png" alt="Kaggle">
-    <img src="https://mma.prnewswire.com/media/1227419/MBZUAI_Logo.jpg?p=facebookg" alt="MBZUAI">
-    <img src="https://docs.anyscale.com/site-assets/logo.png" alt="AnyScale">
-    <img src="https://a16z.com/wp-content/themes/a16z/assets/images/opegraph_images/corporate-Yoast-Twitter.jpg" alt="a16z">
-    <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo-with-title.png" alt="HuggingFace">
-</div>
+We thank [LMSys](https://lmsys.org/) for open-sourcing chatbot arena.
 """
 
     # state = gr.State()
@@ -637,18 +617,17 @@ Learn more about partnership [here](https://lmsys.org/donations/).
 def build_single_model_ui(models, add_promotion_links=False):
     promotion = (
         """
-- | [GitHub](https://github.com/lm-sys/FastChat) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) |
-- Introducing Llama 2: The Next Generation Open Source Large Language Model. [[Website]](https://ai.meta.com/llama/)
-- Vicuna: An Open-Source Chatbot Impressing GPT-4 with 90% ChatGPT Quality. [[Blog]](https://lmsys.org/blog/2023-03-30-vicuna/)
+- | [GitHub](https://github.com/MiuLab/Taiwan-LLM) | [X](https://twitter.com/yentinglin56)
+- Introducing Taiwan-LLM: First open-source large-scale zh-tw llm [Demo](https://twllm.com)
 
-## 🤖 Choose any model to chat
+## 🤖 選擇任一模型開始對話
 """
         if add_promotion_links
         else ""
     )
 
     notice_markdown = f"""
-# 🏔️ Chat with Open Large Language Models
+ # 🏔️ 與開源的大型語言模型對話
 {promotion}
 """
 
@@ -666,7 +645,7 @@ def build_single_model_ui(models, add_promotion_links=False):
             )
         with gr.Row():
             with gr.Accordion(
-                "🔍 Expand to see 20+ model descriptions",
+                "🔍 展開以查看模型描述",
                 open=False,
                 elem_id="model_description_accordion",
             ):
@@ -675,33 +654,34 @@ def build_single_model_ui(models, add_promotion_links=False):
 
         chatbot = gr.Chatbot(
             elem_id="chatbot",
-            label="Scroll down and start chatting",
+            label="向下滾動並開始聊天",
             height=550,
         )
     with gr.Row():
         textbox = gr.Textbox(
             show_label=False,
-            placeholder="👉 Enter your prompt and press ENTER",
+            placeholder="👉 輸入您的訊息並按下 ENTER",
             container=False,
             elem_id="input_box",
         )
-        send_btn = gr.Button(value="Send", variant="primary", scale=0)
+        send_btn = gr.Button(value="發送", variant="primary", scale=0)
 
     with gr.Row() as button_row:
-        upvote_btn = gr.Button(value="👍  Upvote", interactive=False)
-        downvote_btn = gr.Button(value="👎  Downvote", interactive=False)
-        flag_btn = gr.Button(value="⚠️  Flag", interactive=False)
-        regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=False)
-        clear_btn = gr.Button(value="🗑️  Clear history", interactive=False)
+        upvote_btn = gr.Button(value="👍  贊同", interactive=False)
+        downvote_btn = gr.Button(value="👎  不贊同", interactive=False)
+        flag_btn = gr.Button(value="⚠️  標記", interactive=False)
+        regenerate_btn = gr.Button(value="🔄  重新生成", interactive=False)
+        clear_btn = gr.Button(value="🗑️  清除歷史", interactive=False)
 
-    with gr.Accordion("Parameters", open=False) as parameter_row:
+    with gr.Accordion("生成參數", open=False) as parameter_row:
         temperature = gr.Slider(
             minimum=0.0,
             maximum=1.0,
             value=0.7,
             step=0.1,
             interactive=True,
-            label="Temperature",
+            label="隨機性",
+
         )
         top_p = gr.Slider(
             minimum=0.0,
@@ -709,7 +689,7 @@ def build_single_model_ui(models, add_promotion_links=False):
             value=1.0,
             step=0.1,
             interactive=True,
-            label="Top P",
+            label="Top P (機率閾值)",
         )
         max_output_tokens = gr.Slider(
             minimum=16,
@@ -717,7 +697,7 @@ def build_single_model_ui(models, add_promotion_links=False):
             value=1024,
             step=64,
             interactive=True,
-            label="Max output tokens",
+            label="最大輸出字數",
         )
 
     if add_promotion_links:
