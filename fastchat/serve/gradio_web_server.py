@@ -147,7 +147,7 @@ def get_model_list(
             "gpt-3.5-turbo-1106",
         ]
     if add_claude:
-        models += ["claude-2.1", "claude-2.0", "claude-instant-1"]
+        models += ["claude-2.1"]
     if add_palm:
         models += ["gemini-pro"]
     models = list(set(models))

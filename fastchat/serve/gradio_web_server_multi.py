@@ -85,18 +85,18 @@ def load_demo(url_params, request: gr.Request):
         # Only enable these models in anony battles.
         if args.add_chatgpt:
             models_anony += [
-                "gpt-4-0314",
+                "gpt-4-1106-preview",
                 "gpt-4-0613",
                 "gpt-3.5-turbo-0613",
-                "gpt-3.5-turbo-1106",
+                # "gpt-3.5-turbo-1106",
             ]
         if args.add_claude:
-            models_anony += ["claude-2.1", "claude-2.0", "claude-1", "claude-instant-1"]
+            models_anony += ["claude-2.1"]
         if args.add_palm:
             models_anony += ["gemini-pro"]
     anony_only_models = [
-        "claude-1",
-        "gpt-4-0314",
+        # "claude-1",
+        # "gpt-4-0314",
         "gpt-4-0613",
     ]
     for mdl in anony_only_models:
