@@ -109,22 +109,15 @@ def anthropic_api_stream_iter(model_name, prompt, temperature, top_p, max_new_to
 
 
 def init_palm_chat(model_name):
-    import vertexai  # pip3 install google-cloud-aiplatform
-    from vertexai.preview.language_models import ChatModel
-    from vertexai.preview.generative_models import GenerativeModel
-
-    project_id = os.environ["GCP_PROJECT_ID"]
-    location = "us-central1"
-    vertexai.init(project=project_id, location=location)
+    import google.generativeai as genai
+    GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
+    genai.configure(api_key=GOOGLE_API_KEY)
 
     if model_name in ["palm-2"]:
-        # According to release note, "chat-bison@001" is PaLM 2 for chat.
-        # https://cloud.google.com/vertex-ai/docs/release-notes#May_10_2023
-        model_name = "chat-bison@001"
-        chat_model = ChatModel.from_pretrained(model_name)
-        chat = chat_model.start_chat(examples=[])
+        # deprecated
+        raise ValueError("palm-2 is deprecated")
     elif model_name in ["gemini-pro"]:
-        model = GenerativeModel(model_name)
+        model = genai.GenerativeModel(model_name)
         chat = model.start_chat()
     return chat
 
