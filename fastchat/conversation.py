@@ -1408,6 +1408,26 @@ register_conv_template(
     )
 )
 
+register_conv_template(
+    Conversation(
+        name="twllm",
+        system_message="You are a helpful AI assistant. The user you are helping speaks Traditional Chinese and comes from Taiwan.",
+        roles=("user", "assistant"),
+        sep_style=None,
+        sep=None,
+    )
+)
+
+register_conv_template(
+    Conversation(
+        name="breeze",
+        system_message="You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan.",
+        roles=("user", "assistant"),
+        sep_style=None,
+        sep=None,
+    )
+)
+
 if __name__ == "__main__":
     from fastchat.conversation import get_conv_template
 
