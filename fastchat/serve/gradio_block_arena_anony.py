@@ -159,6 +159,9 @@ def share_click(state0, state1, model_selector0, model_selector1, request: gr.Re
 
 
 SAMPLING_WEIGHTS = {
+    "Taiwan-LLM-13B-v2.0-chat": 6,
+    "Taiwan-LLM-MoE-alpha": 6,
+    "Breeze-7B-Instruct-v0.1": 6,
     # tier 0
     "gpt-4": 4,
     "gpt-4-0314": 4,
@@ -289,18 +292,18 @@ BATTLE_TARGETS = {
 }
 
 SAMPLING_BOOST_MODELS = [
-    # "tulu-2-dpo-70b",
-    # "yi-34b-chat",
-    "claude-2.1",
-    "claude-1",
-    "gpt-4-0613",
-    # "gpt-3.5-turbo-1106",
-    # "gpt-4-0314",
-    "gpt-4-turbo",
-    # "dolphin-2.2.1-mistral-7b",
-    "mixtral-8x7b-instruct-v0.1",
-    "gemini-pro",
-    "solar-10.7b-instruct-v1.0",
+    # # "tulu-2-dpo-70b",
+    # # "yi-34b-chat",
+    # "claude-2.1",
+    # "claude-1",
+    # "gpt-4-0613",
+    # # "gpt-3.5-turbo-1106",
+    # # "gpt-4-0314",
+    # "gpt-4-turbo",
+    # # "dolphin-2.2.1-mistral-7b",
+    # "mixtral-8x7b-instruct-v0.1",
+    # "gemini-pro",
+    # "solar-10.7b-instruct-v1.0",
 ]
 
 # outage models won't be sampled.
@@ -487,19 +490,18 @@ def bot_response_multi(
 
 def build_side_by_side_ui_anony(models):
     notice_markdown = """
-# ⚔️  Chatbot Arena ⚔️ : Benchmarking LLMs in the Wild
-| [Blog](https://lmsys.org/blog/2023-05-03-arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2306.05685) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) |
+# ⚔️  繁中 LLM 聊天機器人競技場⚔️ : 野生的大模型測試
 
-## 📜 Rules
-- Ask any question to two anonymous models (e.g., ChatGPT, Claude, Llama) and vote for the better one!
-- You can continue chatting until you identify a winner.
-- Vote won't be counted if model identity is revealed during conversation.
+## 📜 規則
+- 向兩個匿名模型（例如 GPT-4、ChatGPT、Claude、Gemini-Pro、Taiwan-LLM、Breeze）提問，並為較佳者投票！
+- 您可以持續對話，直到確定贏家。
+- 如果在對話過程中透露了模型身份，則不計入投票。
 
-## 🏆 Arena Elo [Leaderboard](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard)
-We use **100K+** human votes to compile an Elo-based LLM leaderboard.
-Find out who is the 🥇LLM Champion!
+## 🏆 競技場 Elo 排行榜
+我們將在收集到足夠的評分後釋出基於Elo的大型語言模型排行榜，並預計之後每週更新。
+找出誰是 🥇繁體中文大型語言模型冠軍！
 
-## 👇 Chat now!
+## 👇 現在就來測試吧！
 
 """
 
@@ -510,7 +512,7 @@ Find out who is the 🥇LLM Champion!
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
 
     with gr.Box(elem_id="share-region-anony"):
-        with gr.Accordion("🔍 Expand to see 20+ Arena players", open=False):
+        with gr.Accordion("🔍 展開以查看競技場選手", open=False):
             model_description_md = get_model_description_md(models)
             gr.Markdown(model_description_md, elem_id="model_description_markdown")
         with gr.Row():
@@ -530,38 +532,38 @@ Find out who is the 🥇LLM Champion!
 
         with gr.Row():
             leftvote_btn = gr.Button(
-                value="👈  A is better", visible=False, interactive=False
+                value="👈  A表現較佳", visible=False, interactive=False
             )
             rightvote_btn = gr.Button(
-                value="👉  B is better", visible=False, interactive=False
+                value="👉  B表現較佳", visible=False, interactive=False
             )
-            tie_btn = gr.Button(value="🤝  Tie", visible=False, interactive=False)
+            tie_btn = gr.Button(value="🤝  平手", visible=False, interactive=False)
             bothbad_btn = gr.Button(
-                value="👎  Both are bad", visible=False, interactive=False
+                value="👎  兩者皆差", visible=False, interactive=False
             )
 
     with gr.Row():
         textbox = gr.Textbox(
             show_label=False,
-            placeholder="👉 Enter your prompt and press ENTER",
+            placeholder="👉 輸入訊息後按下 ENTER",
             container=False,
             elem_id="input_box",
         )
-        send_btn = gr.Button(value="Send", variant="primary", scale=0)
+        send_btn = gr.Button(value="發送", variant="primary", scale=0)
 
     with gr.Row() as button_row:
-        clear_btn = gr.Button(value="🎲 New Round", interactive=False)
-        regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=False)
-        share_btn = gr.Button(value="📷  Share")
+        clear_btn = gr.Button(value="🎲 新一輪", interactive=False)
+        regenerate_btn = gr.Button(value="🔄  重新生成", interactive=False)
+        share_btn = gr.Button(value="📷  分享")
 
-    with gr.Accordion("Parameters", open=False) as parameter_row:
+    with gr.Accordion("生成參數", open=False) as parameter_row:
         temperature = gr.Slider(
             minimum=0.0,
             maximum=1.0,
             value=0.7,
             step=0.1,
             interactive=True,
-            label="Temperature",
+            label="隨機性",
         )
         top_p = gr.Slider(
             minimum=0.0,
@@ -569,7 +571,7 @@ Find out who is the 🥇LLM Champion!
             value=1.0,
             step=0.1,
             interactive=True,
-            label="Top P",
+            label="Top P (機率閾值)",
         )
         max_output_tokens = gr.Slider(
             minimum=16,
@@ -577,7 +579,7 @@ Find out who is the 🥇LLM Champion!
             value=1024,
             step=64,
             interactive=True,
-            label="Max output tokens",
+            label="最大輸出字數",
         )
 
     gr.Markdown(acknowledgment_md, elem_id="ack_markdown")
