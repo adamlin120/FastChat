@@ -8,29 +8,22 @@ services:
     image: fastchat:latest
     ports:
       - "21001:21001"
-    entrypoint: ["python3.9", "-m", "fastchat.serve.controller", "--host", "0.0.0.0", "--port", "21001"]
-  fastchat-model-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    environment:
+      - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
     volumes:
-      - huggingface:/root/.cache/huggingface
-    image: fastchat:latest
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    entrypoint: ["python3.9", "-m", "fastchat.serve.model_worker", "--model-names", "${FASTCHAT_WORKER_MODEL_NAMES:-vicuna-7b-v1.5}", "--model-path", "${FASTCHAT_WORKER_MODEL_PATH:-lmsys/vicuna-7b-v1.5}", "--worker-address", "http://fastchat-model-worker:21002", "--controller-address", "http://fastchat-controller:21001", "--host", "0.0.0.0", "--port", "21002"]
-  fastchat-api-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: fastchat:latest
+      - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
+    entrypoint: ["python3.9", "-m", "fastchat.serve.controller", "--host", "0.0.0.0", "--port", "21001"]
+  gradio-web-server:
+    image: fastchat:latest  # Assuming the same image can be used
+    depends_on:
+      - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
-      - "8000:8000"
-    entrypoint: ["python3.9", "-m", "fastchat.serve.openai_api_server", "--controller-address", "http://fastchat-controller:21001", "--host", "0.0.0.0", "--port", "8000"]
-volumes:
-  huggingface:
+      - "80:80"
+    command: ["python3.9", "-m", "fastchat.serve.gradio_web_server_multi", "--add-chatgpt", "--add-claude", "--anony-only-for-proprietary-model", "--register-openai-compatible-models", "${LOGDIR}/models.json", "--add-palm", "--host", "0.0.0.0", "--port", "80", "--controller-url", "http://fastchat-controller:21001"]
+    environment:
+      - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
