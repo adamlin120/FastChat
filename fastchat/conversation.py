@@ -1421,10 +1421,12 @@ register_conv_template(
 register_conv_template(
     Conversation(
         name="breeze",
+        system_template="{system_message}   [INST] ",
         system_message="You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan.",
-        roles=("user", "assistant"),
-        sep_style=None,
-        sep=None,
+        roles=("[INST]", "[/INST]"),
+        sep_style=SeparatorStyle.LLAMA2,
+        sep=" ",
+        sep2=" ",
     )
 )
 
