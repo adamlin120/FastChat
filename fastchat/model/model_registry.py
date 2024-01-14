@@ -536,3 +536,17 @@ register_model_info(
     "https://huggingface.co/meta-math",
     "MetaMath is a finetune of Llama2 on [MetaMathQA](https://huggingface.co/datasets/meta-math/MetaMathQA) that specializes in mathematical reasoning.",
 )
+
+register_model_info(
+    ["Taiwan-LLM-13B-v2.0-chat", "Taiwan-LLM-MoE-alpha"],
+    "Taiwan-LLM",
+    "https://huggingface.co/collections/yentinglin/taiwan-llm-6523f5a2d6ca498dc3810f07",
+    "Taiwan-LLM 是第一個開源台灣繁體中文大語言模型.",
+)
+
+register_model_info(
+    ["Breeze-7B-Instruct-v0.1"],
+    "Breeze-7B-Instruct",
+    "https://huggingface.co/MediaTek-Research/Breeze-7B-Instruct-v0.1",
+    "Breeze-7B is a language model family that builds on top of Mistral-7B, specifically intended for Traditional Chinese use.",
+)
