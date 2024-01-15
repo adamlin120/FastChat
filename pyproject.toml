@@ -20,7 +20,7 @@ dependencies = [
 
 [project.optional-dependencies]
 model_worker = ["accelerate>=0.21", "peft", "sentencepiece", "torch", "transformers>=4.31.0", "protobuf"]
-webui = ["gradio"]
+webui = ["gradio==3.50.2"]
 arena = ["openai==0.28", "anthropic>=0.3", "plotly", "google-generativeai==0.3.2", "mistralai==0.0.9"]
 train = ["einops", "flash-attn>=2.0", "wandb"]
 llm_judge = ["openai<1", "anthropic>=0.3", "ray"]
