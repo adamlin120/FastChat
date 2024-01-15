@@ -6,3 +6,4 @@ RUN python3.9 get-pip.py
 
 RUN apt-get update -y && apt-get install -y git
 RUN pip3 install "git+https://github.com/adamlin120/FastChat.git@main#egg=fschat[model_worker,webui,arena]"
+RUN pip3 install pydantic==1.10.13
