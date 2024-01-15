@@ -228,7 +228,7 @@ function() {
     url_params = Object.fromEntries(params);
     console.log("url_params", url_params);
 
-    msg = "Users of this website are required to agree to the following terms:\\n\\nThe service is a research preview. It only provides limited safety measures and may generate offensive content. It must not be used for any illegal, harmful, violent, racist, or sexual purposes.\\nThe service collects user dialogue data and reserves the right to distribute it under a Creative Commons Attribution (CC-BY) or a similar license."
+    let msg = "使用本網站的用戶需同意以下條款：\\n\\n本服務為學術研究，僅提供有限的安全措施，可能產生冒犯性內容。不得用於任何非法、有害、暴力、種族歧視或性相關的目的。\\n本服務收集用戶對話數據，並保留以創用CC或類似授權方式分發的權利。\\n\\nService is a research preview with limited safety measures and may generate offensive content. It must not be used for illegal, harmful, violent, racist, or sexual purposes. User dialogue data is collected and may be distributed under a Creative Commons Attribution (CC-BY) or similar license.";
     alert(msg);
 
     return url_params;
