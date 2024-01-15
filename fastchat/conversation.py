@@ -789,6 +789,15 @@ register_conv_template(
     )
 )
 
+register_conv_template(
+    Conversation(
+        name="gemini",
+        roles=("user", "model"),
+        sep_style=None,
+        sep=None,
+    )
+)
+
 # BiLLa default template
 register_conv_template(
     Conversation(
@@ -1405,28 +1414,6 @@ register_conv_template(
         sep_style=SeparatorStyle.ADD_NEW_LINE_SINGLE,
         sep="\n\n",
         stop_str="</s>",
-    )
-)
-
-register_conv_template(
-    Conversation(
-        name="twllm",
-        system_message="You are a helpful AI assistant. The user you are helping speaks Traditional Chinese and comes from Taiwan.",
-        roles=("user", "assistant"),
-        sep_style=None,
-        sep=None,
-    )
-)
-
-register_conv_template(
-    Conversation(
-        name="breeze",
-        system_template="{system_message}   [INST] ",
-        system_message="You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan.",
-        roles=("[INST]", "[/INST]"),
-        sep_style=SeparatorStyle.LLAMA2,
-        sep=" ",
-        sep2=" ",
     )
 )
 

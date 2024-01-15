@@ -1143,13 +1143,13 @@ class GeminiAdapter(BaseModelAdapter):
     """The model adapter for Gemini"""
 
     def match(self, model_path: str):
-        return model_path in ["gemini-pro"]
+        return model_path in ["gemini-pro", "gemini-pro-dev-api"]
 
     def load_model(self, model_path: str, from_pretrained_kwargs: dict):
         raise NotImplementedError()
 
     def get_default_conv_template(self, model_path: str) -> Conversation:
-        return get_conv_template("bard")
+        return get_conv_template("gemini")
 
 
 class BiLLaAdapter(BaseModelAdapter):
@@ -2121,6 +2121,14 @@ class BreezeAdapter(BaseModelAdapter):
 
     def get_default_conv_template(self, model_path: str) -> Conversation:
         return get_conv_template("breeze")
+class SteerLMAdapter(BaseModelAdapter):
+    """The model adapter for nvidia/Llama2-70B-SteerLM-Chat"""
+
+    def match(self, model_path: str):
+        return "steerlm-chat" in model_path.lower()
+
+    def get_default_conv_template(self, model_path: str) -> Conversation:
+        return get_conv_template("steerlm")
 
 
 # Note: the registration order matters.
@@ -2208,6 +2216,7 @@ register_model_adapter(BagelAdapter)
 register_model_adapter(SolarAdapter)
 register_model_adapter(TwllmAdapter)
 register_model_adapter(BreezeAdapter)
+register_model_adapter(SteerLMAdapter)
 
 # After all adapters, try the default base adapter.
 register_model_adapter(BaseModelAdapter)
