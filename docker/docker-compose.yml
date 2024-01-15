@@ -19,11 +19,12 @@ services:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
       - "80:80"
-    command: ["python3.9", "-m", "fastchat.serve.gradio_web_server_multi", "--add-chatgpt", "--add-claude", "--anony-only-for-proprietary-model", "--register-openai-compatible-models", "${LOGDIR}/models.json", "--add-palm", "--host", "0.0.0.0", "--port", "80", "--controller-url", "http://fastchat-controller:21001"]
+    command: ["python3.9", "-m", "fastchat.serve.gradio_web_server_multi", "--show-terms-of-use", "--register-api-endpoint-file", "${LOGDIR}/models.json", "--host", "0.0.0.0", "--port", "80", "--controller-url", "http://fastchat-controller:21001"]
     environment:
       - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
     volumes:
       - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR

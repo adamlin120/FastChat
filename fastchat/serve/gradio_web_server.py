@@ -138,7 +138,7 @@ def get_model_list(controller_url, register_api_endpoint_file):
 
     models = list(set(models))
     visible_models = models.copy()
-    for mdl in visible_models:
+    for mdl in models:
         if mdl not in api_endpoint_info:
             continue
         mdl_dict = api_endpoint_info[mdl]

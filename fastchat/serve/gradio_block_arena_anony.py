@@ -159,9 +159,10 @@ def share_click(state0, state1, model_selector0, model_selector1, request: gr.Re
 
 
 SAMPLING_WEIGHTS = {
-    "Taiwan-LLM-13B-v2.0-chat": 6,
-    "Taiwan-LLM-MoE-alpha": 6,
-    "Breeze-7B-Instruct-v0.1": 6,
+    # zh-tw open-weight models (tier 0)
+    "Taiwan-LLM-13B-v2.0-chat": 4,
+    "Taiwan-LLM-MoE-alpha": 4,
+    "Breeze-7B-Instruct-v0.1": 4,
     # tier 0
     "gpt-4": 4,
     "gpt-4-0314": 4,
@@ -300,16 +301,17 @@ BATTLE_TARGETS = {
     "vicuna-13b": {"llama-2-13b-chat", "llama-2-70b-chat"},
     "vicuna-7b": {"llama-2-7b-chat", "mistral-7b-instruct", "llama-2-13b-chat"},
     "wizardlm-70b": {"gpt-3.5-turbo-0613", "vicuna-33b", "claude-instant-1"},
+    "Taiwan-LLM-13B-v2.0-chat": {"Taiwan-LLM-MoE-alpha", "Breeze-7B-Instruct-v0.1"},  # zh-tw open-weight models should be sampled together more often
 }
 
 SAMPLING_BOOST_MODELS = [
     # "claude-2.1",
-    "gpt-4-0613",
+    # "gpt-4-0613",
     # "gpt-4-0314",
-    "gpt-4-turbo",
-    "mistral-medium",
-    "llama2-70b-steerlm-chat",
-    "gemini-pro-dev-api",
+    # "gpt-4-turbo",
+    # "mistral-medium",
+    # "llama2-70b-steerlm-chat",
+    # "gemini-pro-dev-api",
     # "gemini-pro",
 ]
 
@@ -509,7 +511,7 @@ def build_side_by_side_ui_anony(models):
 # ⚔️  繁中 LLM 聊天機器人競技場⚔️ : 野生的大模型測試
 
 ## 📜 規則
-- 向兩個匿名模型（例如 GPT-4、ChatGPT、Claude、Gemini-Pro、Taiwan-LLM、Breeze）提問，並為較佳者投票！
+- 向兩個匿名模型（例如 GPT-4、ChatGPT、Claude、Gemini-Pro、Mistral-Medium、Taiwan-LLM、Breeze）提問，並為較佳者投票！
 - 您可以持續對話，直到確定贏家。
 - 如果在對話過程中透露了模型身份，則不計入投票。
 
