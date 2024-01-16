@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 from tqdm import tqdm
 
 
-NUM_SERVERS = 14
+NUM_SERVERS = 1
 LOG_ROOT_DIR = "~/fastchat_logs"
 
 
@@ -20,9 +20,9 @@ def get_log_files(max_num_files=None):
     log_root = os.path.expanduser(LOG_ROOT_DIR)
     filenames = []
     for i in range(NUM_SERVERS):
-        for filename in os.listdir(f"{log_root}/server{i}"):
+        for filename in os.listdir(f"{log_root}/"):
             if filename.endswith("-conv.json"):
-                filepath = f"{log_root}/server{i}/{filename}"
+                filepath = f"{log_root}/{filename}"
                 name_tstamp_tuple = (filepath, os.path.getmtime(filepath))
                 filenames.append(name_tstamp_tuple)
     # sort by tstamp
@@ -181,7 +181,7 @@ def report_basic_stats(log_files):
         num_chats_last_24_hours.append(num)
     times = [
         datetime.datetime.fromtimestamp(
-            base + i * 3600, tz=timezone("US/Pacific")
+            base + i * 3600, tz=timezone("Asia/Taipei")
         ).strftime("%Y-%m-%d %H:%M:%S %Z")
         for i in range(24, 0, -1)
     ]
@@ -191,7 +191,7 @@ def report_basic_stats(log_files):
     # Last update datetime
     last_updated_tstamp = now_t
     last_updated_datetime = datetime.datetime.fromtimestamp(
-        last_updated_tstamp, tz=timezone("US/Pacific")
+        last_updated_tstamp, tz=timezone("Asia/Taipei")
     ).strftime("%Y-%m-%d %H:%M:%S %Z")
 
     # code.interact(local=locals())

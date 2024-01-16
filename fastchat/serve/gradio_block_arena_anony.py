@@ -313,6 +313,11 @@ SAMPLING_BOOST_MODELS = [
     # "llama2-70b-steerlm-chat",
     # "gemini-pro-dev-api",
     # "gemini-pro",
+    "claude-instant-1.2",
+    "mistral-tiny",
+    "mistral-small",
+    "mistral-medium",
+    "gpt-3.5-turbo-1106",
 ]
 
 # outage models won't be sampled.

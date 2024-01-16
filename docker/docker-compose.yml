@@ -28,3 +28,14 @@ services:
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
     volumes:
       - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
+  gradio-monitor:
+    image: fastchat:latest  # Assuming the same image can be used
+    depends_on:
+      - fastchat-controller  # Ensure this service starts after the fastchat-controller
+    ports:
+      - "1024:1024"
+    command: ["python3.9", "-m", "fastchat.serve.monitor.monitor", "--host", "0.0.0.0", "--port", "1024"]
+    environment:
+      - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
+    volumes:
+      - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
