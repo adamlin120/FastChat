@@ -302,6 +302,7 @@ BATTLE_TARGETS = {
     "vicuna-7b": {"llama-2-7b-chat", "mistral-7b-instruct", "llama-2-13b-chat"},
     "wizardlm-70b": {"gpt-3.5-turbo-0613", "vicuna-33b", "claude-instant-1"},
     "Taiwan-LLM-13B-v2.0-chat": {"Taiwan-LLM-MoE-alpha", "Breeze-7B-Instruct-v0.1"},  # zh-tw open-weight models should be sampled together more often
+    "Taiwan-LLM-MoE-alpha": {"Taiwan-LLM-13B-v2.0-chat", "Breeze-7B-Instruct-v0.1", "claude-2.1", "mistral-medium"}
 }
 
 SAMPLING_BOOST_MODELS = [
@@ -313,6 +314,7 @@ SAMPLING_BOOST_MODELS = [
     # "llama2-70b-steerlm-chat",
     # "gemini-pro-dev-api",
     # "gemini-pro",
+    "Taiwan-LLM-MoE-alpha",
     "claude-instant-1.2",
     "mistral-tiny",
     "mistral-small",
