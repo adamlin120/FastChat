@@ -104,7 +104,8 @@ def rightvote_last_response(
 ):
     logger.info(f"rightvote (anony). ip: {get_ip(request)}")
     for x in vote_last_response(
-        [state0, state1], "rightvote", [model_selector0, model_selector1], request
+        [state0, state1], "rightvote", [
+            model_selector0, model_selector1], request
     ):
         yield x
 
@@ -124,7 +125,8 @@ def bothbad_vote_last_response(
 ):
     logger.info(f"bothbad_vote (anony). ip: {get_ip(request)}")
     for x in vote_last_response(
-        [state0, state1], "bothbad_vote", [model_selector0, model_selector1], request
+        [state0, state1], "bothbad_vote", [
+            model_selector0, model_selector1], request
     ):
         yield x
 
@@ -235,6 +237,7 @@ BATTLE_TARGETS = {
         "gpt-3.5-turbo-0613",
         "gpt-3.5-turbo-1106",
         "claude-2.1",
+        "gemini-pro",
     },
     "gpt-3.5-turbo-0613": {"claude-instant-1", "gpt-4-0613", "claude-2.1"},
     "gpt-3.5-turbo-1106": {"gpt-4-0613", "claude-instant-1", "gpt-3.5-turbo-0613"},
@@ -301,7 +304,8 @@ BATTLE_TARGETS = {
     "vicuna-13b": {"llama-2-13b-chat", "llama-2-70b-chat"},
     "vicuna-7b": {"llama-2-7b-chat", "mistral-7b-instruct", "llama-2-13b-chat"},
     "wizardlm-70b": {"gpt-3.5-turbo-0613", "vicuna-33b", "claude-instant-1"},
-    "Taiwan-LLM-13B-v2.0-chat": {"Taiwan-LLM-MoE-alpha", "Breeze-7B-Instruct-v0.1"},  # zh-tw open-weight models should be sampled together more often
+    # zh-tw open-weight models should be sampled together more often
+    "Taiwan-LLM-13B-v2.0-chat": {"Taiwan-LLM-MoE-alpha", "Breeze-7B-Instruct-v0.1"},
     "Taiwan-LLM-MoE-alpha": {"Taiwan-LLM-13B-v2.0-chat", "Breeze-7B-Instruct-v0.1", "claude-2.1", "mistral-medium"}
 }
 
@@ -313,13 +317,10 @@ SAMPLING_BOOST_MODELS = [
     # "mistral-medium",
     # "llama2-70b-steerlm-chat",
     # "gemini-pro-dev-api",
-    # "gemini-pro",
-    "Taiwan-LLM-MoE-alpha",
+    "gemini-pro",
     "claude-instant-1.2",
     "mistral-tiny",
     "mistral-small",
-    "mistral-medium",
-    "gpt-3.5-turbo-1106",
 ]
 
 # outage models won't be sampled.
@@ -419,7 +420,8 @@ def add_text(
 
     conv = states[0].conv
     if (len(conv.messages) - conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
-        logger.info(f"conversation turn limit. ip: {get_ip(request)}. text: {text}")
+        logger.info(
+            f"conversation turn limit. ip: {get_ip(request)}. text: {text}")
         for i in range(num_sides):
             states[i].skip_next = True
         return (
@@ -539,7 +541,8 @@ def build_side_by_side_ui_anony(models):
     with gr.Box(elem_id="share-region-anony"):
         with gr.Accordion("🔍 展開以查看競技場選手", open=False):
             model_description_md = get_model_description_md(models)
-            gr.Markdown(model_description_md, elem_id="model_description_markdown")
+            gr.Markdown(model_description_md,
+                        elem_id="model_description_markdown")
         with gr.Row():
             for i in range(num_sides):
                 label = "Model A" if i == 0 else "Model B"
@@ -562,7 +565,8 @@ def build_side_by_side_ui_anony(models):
             rightvote_btn = gr.Button(
                 value="👉  B表現較佳", visible=False, interactive=False
             )
-            tie_btn = gr.Button(value="🤝  平手", visible=False, interactive=False)
+            tie_btn = gr.Button(
+                value="🤝  平手", visible=False, interactive=False)
             bothbad_btn = gr.Button(
                 value="👎  兩者皆差", visible=False, interactive=False
             )
@@ -620,22 +624,26 @@ def build_side_by_side_ui_anony(models):
     leftvote_btn.click(
         leftvote_last_response,
         states + model_selectors,
-        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
+        model_selectors + [textbox, leftvote_btn,
+                           rightvote_btn, tie_btn, bothbad_btn],
     )
     rightvote_btn.click(
         rightvote_last_response,
         states + model_selectors,
-        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
+        model_selectors + [textbox, leftvote_btn,
+                           rightvote_btn, tie_btn, bothbad_btn],
     )
     tie_btn.click(
         tievote_last_response,
         states + model_selectors,
-        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
+        model_selectors + [textbox, leftvote_btn,
+                           rightvote_btn, tie_btn, bothbad_btn],
     )
     bothbad_btn.click(
         bothbad_vote_last_response,
         states + model_selectors,
-        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
+        model_selectors + [textbox, leftvote_btn,
+                           rightvote_btn, tie_btn, bothbad_btn],
     )
     regenerate_btn.click(
         regenerate, states, states + chatbots + [textbox] + btn_list
@@ -649,7 +657,8 @@ def build_side_by_side_ui_anony(models):
     clear_btn.click(
         clear_history,
         None,
-        states + chatbots + model_selectors + [textbox] + btn_list + [slow_warning],
+        states + chatbots + model_selectors +
+        [textbox] + btn_list + [slow_warning],
     )
 
     share_js = """
