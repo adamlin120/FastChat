@@ -163,10 +163,14 @@ def palm_api_stream_iter(model_name, chat, message, temperature, top_p, max_new_
         yield data
 
 
-def gemini_api_stream_iter(model_name, conv, temperature, top_p, max_new_tokens):
+def gemini_api_stream_iter(
+    model_name, conv, temperature, top_p, max_new_tokens, api_key=None
+):
     import google.generativeai as genai  # pip install google-generativeai
 
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    if api_key is None:
+        api_key = os.environ["GEMINI_API_KEY"]
+    genai.configure(api_key=api_key)
 
     generation_config = {
         "temperature": temperature,
@@ -213,6 +217,75 @@ def gemini_api_stream_iter(model_name, conv, temperature, top_p, max_new_tokens)
             "text": f"**API REQUEST ERROR** Reason: {reason}.",
             "error_code": 1,
         }
+
+
+def bard_api_stream_iter(model_name, conv, temperature, top_p, api_key=None):
+    del top_p  # not supported
+    del temperature  # not supported
+
+    if api_key is None:
+        api_key = os.environ["BARD_API_KEY"]
+
+    # convert conv to conv_bard
+    conv_bard = []
+    for turn in conv:
+        if turn["role"] == "user":
+            conv_bard.append({"author": "0", "content": turn["content"]})
+        elif turn["role"] == "assistant":
+            conv_bard.append({"author": "1", "content": turn["content"]})
+        else:
+            raise ValueError(f"Unsupported role: {turn['role']}")
+
+    params = {
+        "model": model_name,
+        "prompt": conv_bard,
+    }
+    logger.info(f"==== request ====\n{params}")
+
+    try:
+        res = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta2/models/{model_name}:generateMessage?key={api_key}",
+            json={
+                "prompt": {
+                    "messages": conv_bard,
+                },
+            },
+            timeout=30,
+        )
+    except Exception as e:
+        logger.error(f"==== error ====\n{e}")
+        yield {
+            "text": f"**API REQUEST ERROR** Reason: {e}.",
+            "error_code": 1,
+        }
+
+    if res.status_code != 200:
+        logger.error(f"==== error ==== ({res.status_code}): {res.text}")
+        yield {
+            "text": f"**API REQUEST ERROR** Reason: status code {res.status_code}.",
+            "error_code": 1,
+        }
+
+    response_json = res.json()
+    if "candidates" not in response_json:
+        logger.error(f"==== error ==== response blocked: {response_json}")
+        reason = response_json["filters"][0]["reason"]
+        yield {
+            "text": f"**API REQUEST ERROR** Reason: {reason}.",
+            "error_code": 1,
+        }
+
+    response = response_json["candidates"][0]["content"]
+    pos = 0
+    while pos < len(response):
+        # simulate token streaming
+        pos += random.randint(3, 6)
+        time.sleep(0.002)
+        data = {
+            "text": response[:pos],
+            "error_code": 0,
+        }
+        yield data
 
 
 def ai2_api_stream_iter(
@@ -331,7 +404,7 @@ def mistral_api_stream_iter(model_name, messages, temperature, top_p, max_new_to
 
 
 def nvidia_api_stream_iter(model_name, messages, temp, top_p, max_tokens, api_base):
-    assert model_name in ["llama2-70b-steerlm-chat"]
+    assert model_name in ["llama2-70b-steerlm-chat", "yi-34b-chat"]
 
     api_key = os.environ["NVIDIA_API_KEY"]
     headers = {

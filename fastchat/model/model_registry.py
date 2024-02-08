@@ -29,10 +29,49 @@ def get_model_info(name: str) -> ModelInfo:
 
 
 register_model_info(
-    ["mixtral-8x7b-instruct-v0.1", "mistral-medium", "mistral-small"],
+    [
+        "IEITYuan/Yuan2-2B-Janus-hf",
+        "IEITYuan/Yuan2-2B-hf",
+        "IEITYuan/Yuan2-51B-hf",
+        "IEITYuan/Yuan2-102B-hf",
+    ],
+    "IEIT-Yuan2",
+    "https://github.com/IEIT-Yuan/Yuan-2.0",
+    "Yuan2.0 is a new generation Fundamental Large Language Model developed by IEIT System.",
+)
+
+register_model_info(
+    ["mixtral-8x7b-instruct-v0.1", "mistral-medium", "mistral-7b-instruct-v0.2", "mistral-small"],
     "Mixtral of experts",
     "https://mistral.ai/news/mixtral-of-experts/",
     "A Mixture-of-Experts model by Mistral AI",
+)
+
+register_model_info(
+    ["qwen1.5-72b-chat",
+     "qwen1.5-14b-chat",
+     "qwen1.5-7b-chat",
+     "qwen1.5-4b-chat",
+     "qwen1.5-1.8b-chat",
+     "qwen1.5-0.5b-chat",
+     "qwen-14b-chat"],
+    "Qwen 1.5",
+    "https://qwenlm.github.io/blog/qwen1.5/",
+    "a large language model by Alibaba Cloud",
+)
+
+register_model_info(
+    ["qwen-14b-chat"],
+    "Qwen",
+    "https://huggingface.co/Qwen",
+    "a large language model by Alibaba Cloud",
+)
+
+register_model_info(
+    ["bard-feb-2024", "bard-jan-24-gemini-pro"],
+    "Bard",
+    "https://bard.google.com/",
+    "Bard by Google",
 )
 
 register_model_info(
@@ -65,7 +104,13 @@ register_model_info(
 )
 
 register_model_info(
-    ["gpt-3.5-turbo", "gpt-3.5-turbo-0314", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-1106"],
+    [
+        "gpt-3.5-turbo",
+        "gpt-3.5-turbo-0125",
+        "gpt-3.5-turbo-1106",
+        "gpt-3.5-turbo-0314",
+        "gpt-3.5-turbo-0613"
+    ],
     "GPT-3.5",
     "https://platform.openai.com/docs/models/gpt-3-5",
     "GPT-3.5-Turbo by OpenAI",
@@ -97,6 +142,34 @@ register_model_info(
     "Claude Instant",
     "https://www.anthropic.com/index/introducing-claude",
     "Claude Instant by Anthropic",
+)
+
+register_model_info(
+    ["nous-hermes-2-mixtral-8x7b-dpo"],
+    "Nous-Hermes-2-Mixtral-8x7B-DPO",
+    "https://huggingface.co/NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+    "Nous Hermes finetuned from Mixtral 8x7B",
+)
+
+register_model_info(
+    ["openchat-3.5-0106", "openchat-3.5"],
+    "OpenChat 3.5",
+    "https://github.com/imoneoi/openchat",
+    "an open model fine-tuned on Mistral-7B using C-RLFT",
+)
+
+register_model_info(
+    ["deepseek-llm-67b-chat"],
+    "DeepSeek LLM",
+    "https://huggingface.co/deepseek-ai/deepseek-llm-67b-chat",
+    "An advanced language model by DeepSeek",
+)
+
+register_model_info(
+    ["stripedhyena-nous-7b"],
+    "StripedHyena-Nous",
+    "https://huggingface.co/togethercomputer/StripedHyena-Nous-7B",
+    "A chat model developed by Together Research and Nous Research.",
 )
 
 register_model_info(
@@ -170,10 +243,10 @@ register_model_info(
 )
 
 register_model_info(
-    ["openchat-3.5"],
-    "OpenChat 3.5",
-    "https://github.com/imoneoi/openchat",
-    "an open model fine-tuned on Mistral-7B using C-RLFT",
+    ["tenyxchat-7b-v1"],
+    "TenyxChat-7B",
+    "https://huggingface.co/tenyx/TenyxChat-7B-v1",
+    "an open model DPO trained on top of OpenChat-3.5 using Tenyx fine-tuning",
 )
 
 register_model_info(
@@ -202,13 +275,6 @@ register_model_info(
     "TinyLlama",
     "https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0",
     "The TinyLlama project is an open endeavor to pretrain a 1.1B Llama model on 3 trillion tokens.",
-)
-
-register_model_info(
-    ["qwen-14b-chat"],
-    "Qwen",
-    "https://huggingface.co/Qwen/Qwen-14B-Chat",
-    "a large language model by Alibaba Cloud",
 )
 
 register_model_info(
@@ -550,6 +616,13 @@ register_model_info(
     "MetaMath",
     "https://huggingface.co/meta-math",
     "MetaMath is a finetune of Llama2 on [MetaMathQA](https://huggingface.co/datasets/meta-math/MetaMathQA) that specializes in mathematical reasoning.",
+)
+
+register_model_info(
+    ["Yuan2-2B-hf", "Yuan2-51B-hf", "Yuan2-102B-hf"],
+    "IEIYuan",
+    "https://huggingface.co/IEITYuan",
+    "Yuan2 is a Basemodel developed by IEI.",
 )
 
 register_model_info(

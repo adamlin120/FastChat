@@ -37,6 +37,7 @@ from fastchat.serve.api_provider import (
     openai_api_stream_iter,
     palm_api_stream_iter,
     gemini_api_stream_iter,
+    bard_api_stream_iter,
     mistral_api_stream_iter,
     nvidia_api_stream_iter,
     ai2_api_stream_iter,
@@ -55,15 +56,24 @@ logger = build_logger("gradio_web_server", "gradio_web_server.log")
 
 headers = {"User-Agent": "FastChat Client"}
 
-no_change_btn = gr.Button.update()
-enable_btn = gr.Button.update(interactive=True, visible=True)
-disable_btn = gr.Button.update(interactive=False)
-invisible_btn = gr.Button.update(interactive=False, visible=False)
+no_change_btn = gr.Button()
+enable_btn = gr.Button(interactive=True, visible=True)
+disable_btn = gr.Button(interactive=False)
+invisible_btn = gr.Button(interactive=False, visible=False)
 
 controller_url = None
 enable_moderation = False
 
 acknowledgment_md = """
+### Terms of Service
+
+Users are required to agree to the following terms before using the service:
+
+The service is a research preview. It only provides limited safety measures and may generate offensive content.
+It must not be used for any illegal, harmful, violent, racist, or sexual purposes.
+The service collects user dialogue data and reserves the right to distribute it under a Creative Commons Attribution (CC-BY) or a similar license.
+Additionally, Bard is offered on LMSys for research purposes only. To access the Bard product, please visit its [website](http://bard.google.com).
+
 ### Acknowledgment
 <div class="image-container">
     <p> We thank <a href="http://lmsys.org/" target="_blank">LMSYS</a> for opensourcing the chatbot arena, which our project has forked to test traditional Chinese LLMs. </p>
@@ -122,6 +132,7 @@ def get_conv_log_filename():
 
 
 def get_model_list(controller_url, register_api_endpoint_file):
+    global api_endpoint_info
     if controller_url:
         ret = requests.post(controller_url + "/refresh_all_workers")
         assert ret.status_code == 200
@@ -132,7 +143,6 @@ def get_model_list(controller_url, register_api_endpoint_file):
 
     # Add API providers
     if register_api_endpoint_file:
-        global api_endpoint_info
         api_endpoint_info = json.load(open(register_api_endpoint_file))
         models += list(api_endpoint_info.keys())
 
@@ -160,7 +170,7 @@ def load_demo_single(models, url_params):
         if model in models:
             selected_model = model
 
-    dropdown_update = gr.Dropdown.update(
+    dropdown_update = gr.Dropdown(
         choices=models, value=selected_model, visible=True
     )
 
@@ -436,7 +446,21 @@ def bot_response(
         )
     elif model_api_dict["api_type"] == "gemini":
         stream_iter = gemini_api_stream_iter(
-            model_api_dict["model_name"], conv, temperature, top_p, max_new_tokens
+            model_api_dict["model_name"],
+            conv,
+            temperature,
+            top_p,
+            max_new_tokens,
+            api_key=model_api_dict["api_key"],
+        )
+    elif model_api_dict["api_type"] == "bard":
+        prompt = conv.to_openai_api_messages()
+        stream_iter = bard_api_stream_iter(
+            model_api_dict["model_name"],
+            prompt,
+            temperature,
+            top_p,
+            api_key=model_api_dict["api_key"],
         )
     elif model_api_dict["api_type"] == "mistral":
         prompt = conv.to_openai_api_messages()
@@ -542,8 +566,11 @@ def bot_response(
 
 
 block_css = """
-#notice_markdown {
-    font-size: 110%
+#chatbot {
+    line-height: 1.5;
+}
+#notice_markdown .prose {
+    font-size: 120% !important;
 }
 #notice_markdown th {
     display: none;
@@ -553,10 +580,10 @@ block_css = """
     padding-bottom: 6px;
 }
 #model_description_markdown {
-    font-size: 110%
+    font-size: 120% !important;
 }
-#leaderboard_markdown {
-    font-size: 110%
+#leaderboard_markdown .prose {
+    font-size: 120% !important;
 }
 #leaderboard_markdown td {
     padding-top: 6px;
@@ -565,16 +592,16 @@ block_css = """
 #leaderboard_dataframe td {
     line-height: 0.1em;
 }
-#about_markdown {
-    font-size: 110%
+#about_markdown .prose {
+    font-size: 120% !important;
 }
-#ack_markdown {
-    font-size: 110%
+#ack_markdown .prose {
+    font-size: 120% !important;
 }
 #input_box textarea {
 }
 footer {
-    display:none !important
+    display:none !important;
 }
 .image-container {
     display: flex;
@@ -589,12 +616,11 @@ footer {
     max-width: 20%;
 }
 .image-about img {
-    margin: 0 30px;
-    margin-top: 30px;
-    height: 60px;
+    margin: 0 20px;
+    margin-top: 20px;
+    height: 40px;
     max-height: 100%;
     width: auto;
-    max-width: 20%;
     float: left;
 }
 """
@@ -668,7 +694,7 @@ def build_single_model_ui(models, add_promotion_links=False):
     state = gr.State()
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
 
-    with gr.Box(elem_id="share-region-named"):
+    with gr.Group(elem_id="share-region-named"):
         with gr.Row(elem_id="model_selector_row"):
             model_selector = gr.Dropdown(
                 choices=models,
@@ -690,6 +716,7 @@ def build_single_model_ui(models, add_promotion_links=False):
             elem_id="chatbot",
             label="向下滾動並開始聊天",
             height=550,
+            show_copy_button=True,
         )
     with gr.Row():
         textbox = gr.Textbox(
@@ -884,7 +911,7 @@ if __name__ == "__main__":
     # Launch the demo
     demo = build_demo(models)
     demo.queue(
-        concurrency_count=args.concurrency_count, status_update_rate=10, api_open=False
+        default_concurrency_limit=args.concurrency_count, status_update_rate=10, api_open=False
     ).launch(
         server_name=args.host,
         server_port=args.port,
