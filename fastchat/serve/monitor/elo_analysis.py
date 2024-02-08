@@ -333,7 +333,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--clean-battle-file", type=str)
     parser.add_argument("--max-num-files", type=int)
-    parser.add_argument("--num-bootstrap", type=int, default=100)
+    parser.add_argument("--num-bootstrap", type=int, default=1000)
     parser.add_argument(
         "--rating-system", type=str, choices=["bt", "elo"], default="bt"
     )

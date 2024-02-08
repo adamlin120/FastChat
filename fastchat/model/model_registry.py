@@ -58,7 +58,7 @@ register_model_info(
 )
 
 register_model_info(
-    ["gpt-4-turbo"],
+    ["gpt-4-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview"],
     "GPT-4-Turbo",
     "https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo",
     "GPT-4-Turbo by OpenAI",
@@ -553,10 +553,17 @@ register_model_info(
 )
 
 register_model_info(
-    ["Taiwan-LLM-13B-v2.0-chat", "Taiwan-LLM-MoE-alpha"],
+    ["Taiwan-LLM-13B-v2.0-chat"],
     "Taiwan-LLM",
     "https://huggingface.co/collections/yentinglin/taiwan-llm-6523f5a2d6ca498dc3810f07",
     "Taiwan-LLM 是第一個開源台灣繁體中文大語言模型.",
+)
+
+register_model_info(
+    ["Taiwan-LLM-MoE-alpha"],
+    "Taiwan-MoE",
+    "https://huggingface.co/collections/yentinglin/taiwan-llm-6523f5a2d6ca498dc3810f07",
+    "TAiwan-MoE 是台灣繁體中文 MoE 語言模型.",
 )
 
 register_model_info(

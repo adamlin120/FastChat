@@ -170,8 +170,11 @@ SAMPLING_WEIGHTS = {
     "gpt-4-0314": 4,
     "gpt-4-0613": 4,
     "gpt-4-turbo": 4,
+    "gpt-4-1106-preview": 4,
+    "gpt-4-0125-preview": 4,
     "gpt-3.5-turbo-0613": 2,
     "gpt-3.5-turbo-1106": 2,
+    "gpt-3.5-turbo-0125": 4,
     "claude-2.1": 4,
     "claude-2.0": 2,
     "claude-1": 2,
@@ -239,6 +242,13 @@ BATTLE_TARGETS = {
         "claude-2.1",
         "gemini-pro",
     },
+    "gpt-4-0125-preview": {
+         "gpt-4-turbo",
+         "gpt-4-0613",
+         "gpt-3.5-turbo-0613",
+         "claude-2.1",
+         "mistral-medium",
+     },
     "gpt-3.5-turbo-0613": {"claude-instant-1", "gpt-4-0613", "claude-2.1"},
     "gpt-3.5-turbo-1106": {"gpt-4-0613", "claude-instant-1", "gpt-3.5-turbo-0613"},
     "solar-10.7b-instruct-v1.0": {
@@ -306,7 +316,7 @@ BATTLE_TARGETS = {
     "wizardlm-70b": {"gpt-3.5-turbo-0613", "vicuna-33b", "claude-instant-1"},
     # zh-tw open-weight models should be sampled together more often
     "Taiwan-LLM-13B-v2.0-chat": {"Taiwan-LLM-MoE-alpha", "Breeze-7B-Instruct-v0.1"},
-    "Taiwan-LLM-MoE-alpha": {"Taiwan-LLM-13B-v2.0-chat", "Breeze-7B-Instruct-v0.1", "claude-2.1", "mistral-medium"}
+    "Taiwan-LLM-MoE-alpha": {"Taiwan-LLM-13B-v2.0-chat", "Breeze-7B-Instruct-v0.1", "claude-2.1", "gpt-3.5-turbo-1106"}
 }
 
 SAMPLING_BOOST_MODELS = [
@@ -317,10 +327,11 @@ SAMPLING_BOOST_MODELS = [
     # "mistral-medium",
     # "llama2-70b-steerlm-chat",
     # "gemini-pro-dev-api",
-    "gemini-pro",
-    "claude-instant-1.2",
-    "mistral-tiny",
-    "mistral-small",
+    # "gemini-pro",
+    # "claude-instant-1.2",
+    # "mistral-tiny",
+    # "mistral-small",
+    "Taiwan-LLM-MoE-alpha"
 ]
 
 # outage models won't be sampled.

@@ -37,11 +37,10 @@ def make_default_md(arena_df, elo_results):
     total_models = len(arena_df)
 
     leaderboard_md = f"""
-# 🏆 LMSYS Chatbot Arena Leaderboard
-| [Vote](https://chat.lmsys.org) | [Blog](https://lmsys.org/blog/2023-05-03-arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2306.05685) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) |
+# 🏆  繁中 LLM 聊天機器人競技場排行榜
+- | [GitHub](https://github.com/MiuLab/Taiwan-LLM) | [X](https://twitter.com/yentinglin56)
 
-LMSYS [Chatbot Arena](https://lmsys.org/blog/2023-05-03-arena/) is a crowdsourced open platform for LLM evals.
-We've collected over **200,000** human preference votes to rank LLMs with the Elo ranking system.
+我們已經收集了超過 **700** 人的偏好投票，以Elo排名系統對LLM進行排名。
 """
     return leaderboard_md
 
@@ -51,19 +50,20 @@ def make_arena_leaderboard_md(arena_df):
     total_models = len(arena_df)
 
     leaderboard_md = f"""
-Total #models: **{total_models}**. Total #votes: **{total_votes}**. Last updated: Jan 9, 2024.
+總模型數量: **{total_models}**。總投票數: **{total_votes}**。最後更新時間: 2024年1月31日。
 
-Contribute your vote 🗳️ at [chat.lmsys.org](https://chat.lmsys.org)! Find more analysis in the [notebook]({notebook_url}).
+在 [arena.twllm.com](http://arena.twllm.com) 投下您的一票 🗳️！
 """
     return leaderboard_md
 
 
 def make_full_leaderboard_md(elo_results):
     leaderboard_md = f"""
-Two more benchmarks are displayed: **MT-Bench** and **MMLU**.
-- [MT-Bench](https://arxiv.org/abs/2306.05685): a set of challenging multi-turn questions. We use GPT-4 to grade the model responses.
-- [MMLU](https://arxiv.org/abs/2009.03300) (5-shot): a test to measure a model's multitask accuracy on 57 tasks.
+新增展示了兩個基準測試：**Taiwan-Bench** 和 **TMMLU+**。
+- [Taiwan-Bench](https://huggingface.co/datasets/yentinglin/Taiwan-Bench)：一套從[MT-Bench](https://arxiv.org/abs/2306.05685)翻譯及改編過來的多輪問題集。我們利用GPT-4來對模型的回答進行評分。 Work-In-Progress 進行中...
+- [TMMLU+](https://huggingface.co/datasets/ikala/tmmluplus)（0-shot）：一項測量模型在66項任務上的多任務知識性的測試。
 """
+# 大部分的問題來自於[阿摩線上測驗](https://yamol.tw)，而CommonCrawl數據集包含了大量來自於阿摩的內容，因此這個基準測試很有可能被污染。我們將很快用[TMLU](https://huggingface.co/datasets/miulab/tmlu)來取代TMMLU+。
     return leaderboard_md
 
 
@@ -230,6 +230,7 @@ def get_arena_table(arena_df, model_table_df):
     for i in range(len(arena_df)):
         row = []
         model_key = arena_df.index[i]
+        print(model_key)
         model_name = model_table_df[model_table_df["key"] == model_key]["Model"].values[
             0
         ]
@@ -281,18 +282,18 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
         with gr.Tabs() as tabs:
             # arena table
             arena_table_vals = get_arena_table(arena_df, model_table_df)
-            with gr.Tab("Arena Elo", id=0):
+            with gr.Tab("競技場 Elo", id=0):
                 md = make_arena_leaderboard_md(arena_df)
                 gr.Markdown(md, elem_id="leaderboard_markdown")
                 gr.Dataframe(
                     headers=[
-                        "Rank",
-                        "🤖 Model",
-                        "⭐ Arena Elo",
-                        "📊 95% CI",
-                        "🗳️ Votes",
-                        "Organization",
-                        "License",
+                        "排名",
+                        "🤖 模型",
+                        "⭐ 競技場Elo",
+                        "📊 95%信賴區間",
+                        "🗳️ 投票數",
+                        "組織",
+                        "授權",
                     ],
                     datatype=[
                         "str",
@@ -309,18 +310,18 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
                     column_widths=[50, 200, 100, 100, 100, 150, 150],
                     wrap=True,
                 )
-            with gr.Tab("Full Leaderboard", id=1):
+            with gr.Tab("完整排行榜", id=1):
                 md = make_full_leaderboard_md(elo_results)
                 gr.Markdown(md, elem_id="leaderboard_markdown")
                 full_table_vals = get_full_table(arena_df, model_table_df)
                 gr.Dataframe(
                     headers=[
-                        "🤖 Model",
-                        "⭐ Arena Elo",
-                        "📈 MT-bench",
-                        "📚 MMLU",
-                        "Organization",
-                        "License",
+                        "🤖 模型",
+                        "⭐ 競技場Elo",
+                        "📈 Taiwan-bench",
+                        "📚 TMMLU+",
+                        "組織",
+                        "授權",
                     ],
                     datatype=["markdown", "number", "number", "number", "str", "str"],
                     value=full_table_vals,
@@ -343,32 +344,31 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
 
     if show_plot:
         gr.Markdown(
-            f"""## More Statistics for Chatbot Arena\n
-Below are figures for more statistics. The code for generating them is also included in this [notebook]({notebook_url}).
-You can find more discussions in this blog [post](https://lmsys.org/blog/2023-12-07-leaderboard/).
+            f"""## 更多聊天機器人競技場的統計資料\n
+以下是更多統計數據的圖表。
     """,
             elem_id="leaderboard_markdown",
         )
         with gr.Row():
             with gr.Column():
                 gr.Markdown(
-                    "#### Figure 1: Fraction of Model A Wins for All Non-tied A vs. B Battles"
+                    "#### 圖表 1：所有非平手的 A 對 B 戰鬥中，模型 A 勝利的比例"
                 )
                 plot_1 = gr.Plot(p1, show_label=False)
             with gr.Column():
                 gr.Markdown(
-                    "#### Figure 2: Battle Count for Each Combination of Models (without Ties)"
+                    "#### 圖表 2：每種模型組合的戰鬥次數（不包括平手）"
                 )
                 plot_2 = gr.Plot(p2, show_label=False)
         with gr.Row():
             with gr.Column():
                 gr.Markdown(
-                    "#### Figure 3: Bootstrap of Elo Estimates (1000 Rounds of Random Sampling)"
+                    "#### 圖表 3：Bootstrap 估計的 Elo （1000 輪隨機抽樣）"
                 )
                 plot_3 = gr.Plot(p3, show_label=False)
             with gr.Column():
                 gr.Markdown(
-                    "#### Figure 4: Average Win Rate Against All Other Models (Assuming Uniform Sampling and No Ties)"
+                    "#### 圖表 4：對所有其他模型的平均勝率（假設均勻抽樣且無平手）"
                 )
                 plot_4 = gr.Plot(p4, show_label=False)
 
@@ -392,16 +392,15 @@ def build_demo(elo_results_file, leaderboard_table_file):
         css=block_css,
     ) as demo:
         with gr.Tabs() as tabs:
-            with gr.Tab("Leaderboard", id=0):
+            with gr.Tab("排行榜", id=0):
                 leader_components = build_leaderboard_tab(
                     elo_results_file,
                     leaderboard_table_file,
                     show_plot=True,
                 )
 
-            with gr.Tab("Basic Stats", id=1):
+            with gr.Tab("基本統計", id=1):
                 basic_components = build_basic_stats_tab()
-
         url_params = gr.JSON(visible=False)
         demo.load(
             load_demo,

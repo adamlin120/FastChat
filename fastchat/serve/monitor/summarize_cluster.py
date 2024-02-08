@@ -39,7 +39,7 @@ if __name__ == "__main__":
         print(
             f"cluster {i}, #prompts {num_samples}, percentage: {percentage * 100:.2f}%"
         )
-        instruct = "Given a list of user messages, use less than 8 words to summarize a central topic for all messages in English. Your output should only include a single line. Try to be specific."
+        instruct = "Given a list of user messages, use less than 20 words to summarize a central topic for all messages in Emoji and Taiwan Traditional Chinese. Your output should only include a single line. Try to be very specific."
         split = int(args.num_prompts * 0.8)
         prompt = "\n".join(
             [truncate_string(x, l=200) for x in topk_prompts[:split]]

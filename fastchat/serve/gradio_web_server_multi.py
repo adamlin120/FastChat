@@ -98,7 +98,7 @@ def build_demo(models, elo_results_file, leaderboard_table_file):
                 )
             if elo_results_file:
                 with gr.Tab("排行榜", id=3):
-                    build_leaderboard_tab(elo_results_file, leaderboard_table_file)
+                    build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=True)
             with gr.Tab("關於我們", id=4):
                 about = build_about()
 

@@ -3,8 +3,8 @@ version: "3.9"
 services:
   fastchat-controller:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: docker/Dockerfile
     image: fastchat:latest
     ports:
       - "21001:21001"
@@ -19,7 +19,15 @@ services:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
       - "80:80"
-    command: ["python3.9", "-m", "fastchat.serve.gradio_web_server_multi", "--show-terms-of-use", "--register-api-endpoint-file", "${LOGDIR}/models.json", "--host", "0.0.0.0", "--port", "80", "--controller-url", "http://fastchat-controller:21001"]
+    command: ["python3.9", "-m", "fastchat.serve.gradio_web_server_multi", 
+              "--show-terms-of-use", 
+              "--register-api-endpoint-file", "${LOGDIR}/models.json", 
+              "--host", "0.0.0.0", 
+              "--port", "80", 
+              "--controller-url", "http://fastchat-controller:21001",
+              "--elo-results-file", "/monitor/elo_results_20240130.pkl",
+              "--leaderboard-table-file", "/monitor/leaderboard_table_20240131.csv",
+              ]
     environment:
       - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -28,13 +36,14 @@ services:
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
     volumes:
       - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
+      - /ssd/adamlin/FastChat/fastchat/serve/monitor:/monitor  
   gradio-monitor:
     image: fastchat:latest  # Assuming the same image can be used
     depends_on:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
       - "1024:1024"
-    command: ["python3.9", "-m", "fastchat.serve.monitor.monitor", "--host", "0.0.0.0", "--port", "1024"]
+    command: ["python3.9", "-m", "fastchat.serve.monitor.monitor", "--host", "0.0.0.0", "--port", "8888"]
     environment:
       - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
     volumes:
