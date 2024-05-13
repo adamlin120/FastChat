@@ -2,6 +2,8 @@
 Common utilities.
 """
 from asyncio import AbstractEventLoop
+from io import BytesIO
+import base64
 import json
 import logging
 import logging.handlers
@@ -146,43 +148,49 @@ def get_gpu_memory(max_gpus=None):
     return gpu_memory
 
 
-def oai_moderation(text):
+def oai_moderation(text, custom_thresholds=None):
     """
     Check whether the text violates OpenAI moderation API.
     """
     import openai
 
-    openai.api_base = "https://api.openai.com/v1"
-    openai.api_key = os.environ["OPENAI_API_KEY"]
-    openai.api_type = "open_ai"
-    openai.api_version = None
+    client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-    threshold_dict = {
-        "sexual": 0.2,
-    }
+    # default to true to be conservative
+    flagged = True
     MAX_RETRY = 3
     for _ in range(MAX_RETRY):
         try:
-            res = openai.Moderation.create(input=text)
-            flagged = res["results"][0]["flagged"]
-            for category, threshold in threshold_dict.items():
-                if res["results"][0]["category_scores"][category] > threshold:
-                    flagged = True
+            res = client.moderations.create(input=text)
+            flagged = res.results[0].flagged
+            if custom_thresholds is not None:
+                for category, threshold in custom_thresholds.items():
+                    if getattr(res.results[0].category_scores, category) > threshold:
+                        flagged = True
             break
-        except (openai.error.OpenAIError, KeyError, IndexError) as e:
-            # flag true to be conservative
-            flagged = True
+        except (openai.OpenAIError, KeyError, IndexError) as e:
             print(f"MODERATION ERROR: {e}\nInput: {text}")
     return flagged
 
 
-def moderation_filter(text, model_list):
-    MODEL_KEYWORDS = ["claude", "gpt-4", "gpt-3.5", "bard"]
+def moderation_filter(text, model_list, do_moderation=False):
+    # Apply moderation for below models
+    MODEL_KEYWORDS = ["claude", "gpt", "bard", "mistral-large", "command-r", "dbrx"]
+
+    custom_thresholds = {"sexual": 0.3}
+    # set a stricter threshold for claude
+    for model in model_list:
+        if "claude" in model:
+            custom_thresholds = {"sexual": 0.2}
 
     for keyword in MODEL_KEYWORDS:
         for model in model_list:
-            if keyword in model and oai_moderation(text):
-                return True
+            if keyword in model:
+                do_moderation = True
+                break
+
+    if do_moderation:
+        return oai_moderation(text, custom_thresholds)
     return False
 
 
@@ -236,7 +244,6 @@ function() {
 
     let msg = "使用本網站的用戶需同意以下條款：\\n\\n本服務為學術研究，僅提供有限的安全措施，可能產生冒犯性內容。不得用於任何非法、有害、暴力、種族歧視或性相關的目的。\\n本服務收集用戶對話數據，並保留以創用CC或類似授權方式分發的權利。\\n\\nService is a research preview with limited safety measures and may generate offensive content. It must not be used for illegal, harmful, violent, racist, or sexual purposes. User dialogue data is collected and may be distributed under a Creative Commons Attribution (CC-BY) or similar license.";
     alert(msg);
-
     return url_params;
     }
 """
@@ -358,3 +365,24 @@ def str_to_torch_dtype(dtype: str):
         return torch.bfloat16
     else:
         raise ValueError(f"Unrecognized dtype: {dtype}")
+
+
+def load_image(image_file):
+    from PIL import Image
+    import requests
+
+    image = None
+
+    if image_file.startswith("http://") or image_file.startswith("https://"):
+        timeout = int(os.getenv("REQUEST_TIMEOUT", "3"))
+        response = requests.get(image_file, timeout=timeout)
+        image = Image.open(BytesIO(response.content))
+    elif image_file.lower().endswith(("png", "jpg", "jpeg", "webp", "gif")):
+        image = Image.open(image_file)
+    elif image_file.startswith("data:"):
+        image_file = image_file.split(",")[1]
+        image = Image.open(BytesIO(base64.b64decode(image_file)))
+    else:
+        image = Image.open(BytesIO(base64.b64decode(image_file)))
+
+    return image
