@@ -646,7 +646,7 @@ def build_side_by_side_ui_anony(models):
 
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
 
-    with gr.Box(elem_id="share-region-anony"):
+    with gr.Group(elem_id="share-region-anony"):
         with gr.Accordion("🔍 展開以查看競技場選手", open=False):
             model_description_md = get_model_description_md(models)
             gr.Markdown(model_description_md,

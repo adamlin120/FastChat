@@ -5,7 +5,7 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-    image: fastchat:latest
+    image: fastchat:1.0.0
     ports:
       - "21001:21001"
     environment:
@@ -14,7 +14,7 @@ services:
       - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
     entrypoint: ["python3.9", "-m", "fastchat.serve.controller", "--host", "0.0.0.0", "--port", "21001"]
   gradio-web-server:
-    image: fastchat:latest  # Assuming the same image can be used
+    image: fastchat:1.0.0  # Assuming the same image can be used
     depends_on:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
@@ -38,11 +38,11 @@ services:
       - /ssd/adamlin/FastChat/log:${LOGDIR}  # Mount the host directory to LOGDIR
       - /ssd/adamlin/FastChat/fastchat/serve/monitor:/monitor  
   gradio-monitor:
-    image: fastchat:latest  # Assuming the same image can be used
+    image: fastchat:1.0.0  # Assuming the same image can be used
     depends_on:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
-      - "1024:1024"
+      - "8888:8888"
     command: ["python3.9", "-m", "fastchat.serve.monitor.monitor", "--host", "0.0.0.0", "--port", "8888"]
     environment:
       - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
