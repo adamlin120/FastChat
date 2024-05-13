@@ -21,7 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 model_worker = ["accelerate>=0.21", "peft", "sentencepiece", "torch", "transformers>=4.31.0", "protobuf"]
 webui = ["gradio>=4.10"]
-arena = ["openai==0.28", "anthropic>=0.3", "plotly", "google-generativeai==0.3.2", "mistralai==0.0.9"]
+arena = ["openai==1.28.1", "anthropic==0.25.8", "plotly", "google-generativeai==0.3.2", "mistralai==0.1.8"]
 train = ["einops", "flash-attn>=2.0", "wandb"]
 llm_judge = ["openai<1", "anthropic>=0.3", "ray"]
 dev = ["black==23.3.0", "pylint==2.8.2"]

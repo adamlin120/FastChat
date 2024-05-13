@@ -25,8 +25,8 @@ services:
               "--host", "0.0.0.0", 
               "--port", "80", 
               "--controller-url", "http://fastchat-controller:21001",
-              "--elo-results-file", "/monitor/elo_results_20240130.pkl",
-              "--leaderboard-table-file", "/monitor/leaderboard_table_20240131.csv",
+              # "--elo-results-file", "/monitor/elo_results_20240130.pkl",
+              # "--leaderboard-table-file", "/monitor/leaderboard_table_20240131.csv",
               ]
     environment:
       - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable
