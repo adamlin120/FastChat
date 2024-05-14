@@ -189,8 +189,8 @@ def moderation_filter(text, model_list, do_moderation=False):
                 do_moderation = True
                 break
 
-    if do_moderation:
-        return oai_moderation(text, custom_thresholds)
+    # if do_moderation:
+    #     return oai_moderation(text, custom_thresholds)
     return False
 
 

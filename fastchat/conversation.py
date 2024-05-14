@@ -1742,12 +1742,11 @@ register_conv_template(
     Conversation(
         name="twllm",
         system_message="You are an AI assistant called Twllm, created by TAME (TAiwan Mixture of Expert) project.",
-        system_template="<|system|>\n{system_message}",
-        roles=("<|user|>", "<|assistant|>"),
+        system_template="<|im_start|>system\n{system_message}",
+        roles=("<|im_start|>user", "<|im_start|>assistant"),
         sep_style=SeparatorStyle.CHATML,
-        sep="</s>",
+        sep="<|im_end|>",
         stop_token_ids=[128256],
-        stop_str="</s>",
     )
 )
 
