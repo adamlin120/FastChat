@@ -6,6 +6,7 @@ services:
       context: ../
       dockerfile: docker/Dockerfile
     image: fastchat:1.0.0
+    network_mode: "host"
     ports:
       - "21001:21001"
     environment:
@@ -17,6 +18,7 @@ services:
     image: fastchat:1.0.0  # Assuming the same image can be used
     depends_on:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
+    network_mode: "host"
     ports:
       - "80:80"
     command: ["python3.9", "-m", "fastchat.serve.gradio_web_server_multi", 
@@ -24,7 +26,8 @@ services:
               "--register-api-endpoint-file", "${LOGDIR}/models.json", 
               "--host", "0.0.0.0", 
               "--port", "80", 
-              "--controller-url", "http://fastchat-controller:21001",
+              "--controller-url", "http://localhost:21001",
+              #"--controller-url", "http://fastchat-controller:21001",
               # "--elo-results-file", "/monitor/elo_results_20240130.pkl",
               # "--leaderboard-table-file", "/monitor/leaderboard_table_20240131.csv",
               ]
@@ -43,6 +46,7 @@ services:
       - fastchat-controller  # Ensure this service starts after the fastchat-controller
     ports:
       - "8888:8888"
+    network_mode: "host"
     command: ["python3.9", "-m", "fastchat.serve.monitor.monitor", "--host", "0.0.0.0", "--port", "8888"]
     environment:
       - LOGDIR=${LOGDIR}  # Define the LOGDIR environment variable

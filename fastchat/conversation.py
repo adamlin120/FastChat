@@ -1741,10 +1741,13 @@ register_conv_template(
 register_conv_template(
     Conversation(
         name="twllm",
-        system_message="You are a helpful AI assistant. The user you are helping speaks Traditional Chinese and comes from Taiwan.",
-        roles=("user", "assistant"),
-        sep_style=None,
-        sep=None,
+        system_message="You are an AI assistant called Twllm, created by TAME (TAiwan Mixture of Expert) project.",
+        system_template="<|system|>\n{system_message}",
+        roles=("<|user|>", "<|assistant|>"),
+        sep_style=SeparatorStyle.CHATML,
+        sep="</s>",
+        stop_token_ids=[128256],
+        stop_str="</s>",
     )
 )
 
