@@ -170,9 +170,8 @@ def share_click(state0, state1, model_selector0, model_selector1, request: gr.Re
 
 SAMPLING_WEIGHTS = {
     # zh-tw open-weight models (tier 0)
-    "Taiwan-LLM-13B-v2.0-chat": 4,
-    "Taiwan-LLM-MoE-alpha": 4,
-    "Breeze-7B-Instruct-v0.1": 4,
+    "Llama-3-Taiwan-70B-Instruct-rc1": 8,
+    "Llama-3-Taiwan-8B-Instruct": 4,
     "gpt-4-turbo": 4,
     "gpt-3.5-turbo": 4,
     "claude-3-opus-20240229": 4,
@@ -296,7 +295,7 @@ OUTAGE_MODELS = []
 def get_sample_weight(model):
     if model in OUTAGE_MODELS:
         return 0
-    weight = SAMPLING_WEIGHTS.get(model, 0)
+    weight = SAMPLING_WEIGHTS.get(model, 1)
     if model in SAMPLING_BOOST_MODELS:
         weight *= 5
     return weight

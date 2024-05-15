@@ -7,7 +7,6 @@ python3 clean_battle_data.py --mode conv_release
 import argparse
 import datetime
 import json
-import os
 from pytz import timezone
 import time
 
@@ -16,6 +15,7 @@ from multiprocessing import Pool
 import tiktoken
 from collections import Counter
 import shortuuid
+from datasets import Dataset
 
 from fastchat.serve.monitor.basic_stats import get_log_files, NUM_SERVERS
 from fastchat.utils import detect_language
@@ -377,7 +377,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--max-num-files", type=int)
     parser.add_argument(
-        "--mode", type=str, choices=["simple", "conv_release"], default="simple"
+        "--mode", type=str, choices=["simple", "conv_release", "hf_push"], default="simple"
     )
     parser.add_argument("--exclude-model-names", type=str, nargs="+")
     parser.add_argument("--ban-ip-file", type=str)
@@ -407,6 +407,31 @@ if __name__ == "__main__":
         for i in range(4):
             print(battles[i])
         output = f"clean_battle_{cutoff_date}.json"
+    elif args.mode == 'hf_push':
+        # only have conversations with winner
+        new_battles = []
+        print(f"Original number of battles: {len(battles)}")
+        for x in battles:
+            # "winner": "model_a" 
+            # or
+            # "winner": "model_b"
+            if x["winner"] == "model_a":
+                x["chosen"] = x["conversation_a"]
+                x["rejected"] = x["conversation_b"]
+                new_battles.append(x)
+            elif x["winner"] == "model_b":
+                x["chosen"] = x["conversation_b"] 
+                x["rejected"] = x["conversation_a"]
+                new_battles.append(x)
+        print(f"Number of battles after filtering for winner: {len(battles)}")
+        dataset = Dataset.from_list(new_battles)
+        dataset.push_to_hub("yentinglin/tw_chatbot_arena", "argilla", split='train')
+        dataset = Dataset.from_list(battles)
+        dataset.push_to_hub("yentinglin/tw_chatbot_arena", "all", split='train')
+        battles = new_battles
+        output = f"clean_battle_argilla_{cutoff_date}.json"
+
+
     elif args.mode == "conv_release":
         new_battles = []
         for x in battles:
@@ -420,4 +445,4 @@ if __name__ == "__main__":
 
     with open(output, "w", encoding="utf-8", errors="replace") as fout:
         json.dump(battles, fout, indent=2, ensure_ascii=False)
-    print(f"Write cleaned data to {output}")
+    print(f"Wrote cleaned data to {output}")
