@@ -424,9 +424,9 @@ if __name__ == "__main__":
                 x["rejected"] = x["conversation_a"]
                 new_battles.append(x)
         print(f"Number of battles after filtering for winner: {len(battles)}")
-        dataset = Dataset.from_list(new_battles)
+        dataset = Dataset.from_list(new_battles[::-1])
         dataset.push_to_hub("yentinglin/tw_chatbot_arena", "argilla", split='train')
-        dataset = Dataset.from_list(battles)
+        dataset = Dataset.from_list(battles[::-1])
         dataset.push_to_hub("yentinglin/tw_chatbot_arena", "all", split='train')
         battles = new_battles
         output = f"clean_battle_argilla_{cutoff_date}.json"
