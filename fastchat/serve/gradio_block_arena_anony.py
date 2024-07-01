@@ -504,8 +504,16 @@ def build_side_by_side_ui_anony(models):
 - 如果在對話過程中透露了模型身份，則不計入投票。
 
 ## 🏆 競技場 Elo 排行榜
-我們將在收集到足夠的評分後釋出基於Elo的大型語言模型排行榜，並預計之後每週更新。
+收集的評分結果會定期更新並發布在 https://huggingface.co/datasets/aigrant/tw_chatbot_arena
+
 找出誰是 🥇繁體中文大型語言模型冠軍！
+
+## 🙏 贊助
+
+本專案由「【g0v 零時小學校】繁體中文AI 開源實踐計畫」贊助 (https://sch001.g0v.tw/dash/brd/2024TC-AI-OS-Grant/list)。
+
+模型運行於由優必達(Ubitus K.K.)贊助的 H100 GPU 上。
+
 
 ## 👇 現在就來測試吧！
 

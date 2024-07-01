@@ -67,6 +67,8 @@ The service collects user dialogue data, including both text and images, and res
 
 ### Acknowledgment
 <div class="image-container">
+    <p>本專案由<a href="https://sch001.g0v.tw/dash/brd/2024TC-AI-OS-Grant/list" target="_blank">【g0v 零時小學校】繁體中文AI 開源實踐計畫</a>贊助。</p>
+    <p>模型運行於由<a href="https://www.ubitus.net/" target="_blank">優必達(Ubitus K.K.)</a>贊助的 H100 GPU 上。</p>
     <p> We thank <a href="http://lmsys.org/" target="_blank">LMSYS</a> for opensourcing the chatbot arena, which our project has forked to test traditional Chinese LLMs. </p>
 </div>
 """
