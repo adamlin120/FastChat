@@ -33,11 +33,15 @@ leader_component_values = [None] * 5
 
 
 def make_default_md(arena_df, elo_results):
-    leaderboard_md = f"""
-# 🏆  繁中 LLM 聊天機器人競技場排行榜
-- | [GitHub](https://github.com/MiuLab/Taiwan-LLM) | [X](https://twitter.com/yentinglin56)
+    total_votes = sum(arena_df["num_battles"]) // 2
+    total_models = len(arena_df)
 
-我們已經收集了超過 **700** 人的偏好投票，以Elo排名系統對LLM進行排名。
+    leaderboard_md = f"""
+# 🏆 LMSYS Chatbot Arena Leaderboard
+| [Vote](https://chat.lmsys.org) | [Blog](https://lmsys.org/blog/2023-05-03-arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2306.05685) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) |
+
+LMSYS [Chatbot Arena](https://lmsys.org/blog/2023-05-03-arena/) is a crowdsourced open platform for LLM evals.
+We've collected over **200,000** human preference votes to rank LLMs with the Elo ranking system.
 """
     return leaderboard_md
 
@@ -45,41 +49,28 @@ def make_default_md(arena_df, elo_results):
 def make_arena_leaderboard_md(arena_df):
     total_votes = sum(arena_df["num_battles"]) // 2
     total_models = len(arena_df)
-    space = "&nbsp;&nbsp;&nbsp;"
 
     leaderboard_md = f"""
-Total #models: **{total_models}**.{space} Total #votes: **{"{:,}".format(total_votes)}**.{space} Last updated: April 26, 2024.
+Total #models: **{total_models}**. Total #votes: **{total_votes}**. Last updated: Feb 2, 2024.
 
-📣 **NEW!** View leaderboard for different categories (e.g., coding, long user query)! This is still in preview and subject to change.
+Contribute your vote 🗳️ at [chat.lmsys.org](https://chat.lmsys.org)! Find more analysis in the [notebook]({notebook_url}).
 
-Code to recreate leaderboard tables and plots in this [notebook]({notebook_url}). You can contribute your vote 🗳️ at [chat.lmsys.org](https://chat.lmsys.org)!
-
-***Rank (UB)**: model's ranking (upper-bound), defined by one + the number of models that are statistically better than the target model.
-Model A is statistically better than model B when A's lower-bound score is greater than B's upper-bound score (in 95% confidence interval).
-See Figure 3 below for visualization of the confidence intervals of model scores.
-"""
-    return leaderboard_md
-
-
-def make_category_arena_leaderboard_md(arena_df, arena_subset_df, name="Overall"):
-    total_votes = sum(arena_df["num_battles"]) // 2
-    total_models = len(arena_df)
-    space = "&nbsp;&nbsp;&nbsp;"
-    total_subset_votes = sum(arena_subset_df["num_battles"]) // 2
-    total_subset_models = len(arena_subset_df)
-    leaderboard_md = f"""### {cat_name_to_explanation[name]}
-#### {space} #models: **{total_subset_models} ({round(total_subset_models/total_models *100)}%)** {space} #votes: **{"{:,}".format(total_subset_votes)} ({round(total_subset_votes/total_votes * 100)}%)**{space}
+⚠️ **Some mobile users reported the leaderboard is not displayed normally, please visit [our HF alternative](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard) while we are fixing it**.
 """
     return leaderboard_md
 
 
 def make_full_leaderboard_md(elo_results):
-    leaderboard_md = f"""
-新增展示了兩個基準測試：**Taiwan-Bench** 和 **TMMLU+**。
-- [Taiwan-Bench](https://huggingface.co/datasets/yentinglin/Taiwan-Bench)：一套從[MT-Bench](https://arxiv.org/abs/2306.05685)翻譯及改編過來的多輪問題集。我們利用GPT-4來對模型的回答進行評分。 Work-In-Progress 進行中...
-- [TMMLU+](https://huggingface.co/datasets/ikala/tmmluplus)（0-shot）：一項測量模型在66項任務上的多任務知識性的測試。
+    leaderboard_md = """
+Three benchmarks are displayed: **Arena Elo**, **MT-Bench** and **MMLU**.
+- [Chatbot Arena](https://chat.lmsys.org/?arena) - a crowdsourced, randomized battle platform based on human preference votes.
+- [MT-Bench](https://arxiv.org/abs/2306.05685): a set of challenging multi-turn questions. We use GPT-4 to grade the model responses.
+- [MMLU](https://arxiv.org/abs/2009.03300) (5-shot): a test to measure a model's multitask accuracy on 57 tasks.
+
+💻 Code: The MT-bench scores (single-answer grading on a scale of 10) are computed by [fastchat.llm_judge](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge).
+The MMLU scores are mostly computed by [InstructEval](https://github.com/declare-lab/instruct-eval).
+Higher values are better for all benchmarks. Empty cells mean not available.
 """
-# 大部分的問題來自於[阿摩線上測驗](https://yamol.tw)，而CommonCrawl數據集包含了大量來自於阿摩的內容，因此這個基準測試很有可能被污染。我們將很快用[TMLU](https://huggingface.co/datasets/miulab/tmlu)來取代TMMLU+。
     return leaderboard_md
 
 
@@ -239,174 +230,55 @@ def get_full_table(arena_df, model_table_df):
     return values
 
 
-def create_ranking_str(ranking, ranking_difference):
-    if ranking_difference > 0:
-        # return f"{int(ranking)} (\u2191{int(ranking_difference)})"
-        return f"{int(ranking)} \u2191"
-    elif ranking_difference < 0:
-        # return f"{int(ranking)} (\u2193{int(-ranking_difference)})"
-        return f"{int(ranking)} \u2193"
-    else:
-        return f"{int(ranking)}"
-
-
-def recompute_final_ranking(arena_df):
-    # compute ranking based on CI
-    ranking = {}
-    for i, model_a in enumerate(arena_df.index):
-        ranking[model_a] = 1
-        for j, model_b in enumerate(arena_df.index):
-            if i == j:
-                continue
-            if (
-                arena_df.loc[model_b]["rating_q025"]
-                > arena_df.loc[model_a]["rating_q975"]
-            ):
-                ranking[model_a] += 1
-    return list(ranking.values())
-
-
-def get_arena_table(arena_df, model_table_df, arena_subset_df=None):
-    arena_df = arena_df.sort_values(
-        by=["final_ranking", "rating"], ascending=[True, False]
-    )
-    arena_df["final_ranking"] = recompute_final_ranking(arena_df)
-    arena_df = arena_df.sort_values(by=["final_ranking"], ascending=True)
-
-    # arena_df["final_ranking"] = range(1, len(arena_df) + 1)
+def get_arena_table(arena_df, model_table_df):
     # sort by rating
-    if arena_subset_df is not None:
-        # filter out models not in the arena_df
-        arena_subset_df = arena_subset_df[arena_subset_df.index.isin(arena_df.index)]
-        arena_subset_df = arena_subset_df.sort_values(by=["rating"], ascending=False)
-        # arena_subset_df = arena_subset_df.sort_values(by=["final_ranking"], ascending=True)
-        # arena_subset_df = arena_subset_df[arena_subset_df["num_battles"] > 500]
-        arena_subset_df["final_ranking"] = recompute_final_ranking(arena_subset_df)
-        # keep only the models in the subset in arena_df and recompute final_ranking
-        arena_df = arena_df[arena_df.index.isin(arena_subset_df.index)]
-        # recompute final ranking
-        arena_df["final_ranking"] = recompute_final_ranking(arena_df)
-
-        # assign ranking by the order
-        arena_subset_df["final_ranking_no_tie"] = range(1, len(arena_subset_df) + 1)
-        arena_df["final_ranking_no_tie"] = range(1, len(arena_df) + 1)
-        # join arena_df and arena_subset_df on index
-        arena_df = arena_subset_df.join(
-            arena_df["final_ranking"], rsuffix="_global", how="inner"
-        )
-        arena_df["ranking_difference"] = (
-            arena_df["final_ranking_global"] - arena_df["final_ranking"]
-        )
-
-        # no tie version
-        # arena_df = arena_subset_df.join(arena_df["final_ranking_no_tie"], rsuffix="_global", how="inner")
-        # arena_df["ranking_difference"] =  arena_df["final_ranking_no_tie_global"] - arena_df["final_ranking_no_tie"]
-
-        arena_df = arena_df.sort_values(
-            by=["final_ranking", "rating"], ascending=[True, False]
-        )
-        arena_df["final_ranking"] = arena_df.apply(
-            lambda x: create_ranking_str(x["final_ranking"], x["ranking_difference"]),
-            axis=1,
-        )
-
+    arena_df = arena_df.sort_values(by=["rating"], ascending=False)
     values = []
     for i in range(len(arena_df)):
         row = []
         model_key = arena_df.index[i]
-        try:  # this is a janky fix for where the model key is not in the model table (model table and arena table dont contain all the same models)
-            model_name = model_table_df[model_table_df["key"] == model_key][
-                "Model"
-            ].values[0]
-            # rank
-            ranking = arena_df.iloc[i].get("final_ranking") or i + 1
-            row.append(ranking)
-            if arena_subset_df is not None:
-                row.append(arena_df.iloc[i].get("ranking_difference") or 0)
-            # model display name
-            row.append(model_name)
-            # elo rating
-            row.append(round(arena_df.iloc[i]["rating"]))
-            upper_diff = round(
-                arena_df.iloc[i]["rating_q975"] - arena_df.iloc[i]["rating"]
-            )
-            lower_diff = round(
-                arena_df.iloc[i]["rating"] - arena_df.iloc[i]["rating_q025"]
-            )
-            row.append(f"+{upper_diff}/-{lower_diff}")
-            # num battles
-            row.append(round(arena_df.iloc[i]["num_battles"]))
-            # Organization
-            row.append(
-                model_table_df[model_table_df["key"] == model_key][
-                    "Organization"
-                ].values[0]
-            )
-            # license
-            row.append(
-                model_table_df[model_table_df["key"] == model_key]["License"].values[0]
-            )
-            cutoff_date = model_table_df[model_table_df["key"] == model_key][
-                "Knowledge cutoff date"
-            ].values[0]
-            if cutoff_date == "-":
-                row.append("Unknown")
-            else:
-                row.append(cutoff_date)
-            values.append(row)
-        except Exception as e:
-            print(f"{model_key} - {e}")
+        model_name = model_table_df[model_table_df["key"] == model_key]["Model"].values[
+            0
+        ]
+
+        # rank
+        row.append(i + 1)
+        # model display name
+        row.append(model_name)
+        # elo rating
+        row.append(round(arena_df.iloc[i]["rating"]))
+        upper_diff = round(arena_df.iloc[i]["rating_q975"] - arena_df.iloc[i]["rating"])
+        lower_diff = round(arena_df.iloc[i]["rating"] - arena_df.iloc[i]["rating_q025"])
+        row.append(f"+{upper_diff}/-{lower_diff}")
+        # num battles
+        row.append(round(arena_df.iloc[i]["num_battles"]))
+        # Organization
+        row.append(
+            model_table_df[model_table_df["key"] == model_key]["Organization"].values[0]
+        )
+        # license
+        row.append(
+            model_table_df[model_table_df["key"] == model_key]["License"].values[0]
+        )
+
+        values.append(row)
     return values
 
 
-key_to_category_name = {
-    "full": "Overall",
-    "coding": "Coding",
-    "long_user": "Longer Query",
-    "english": "English",
-    "chinese": "Chinese",
-    "french": "French",
-    "no_tie": "Exclude Ties",
-    "no_short": "Exclude Short Query (< 5 tokens)",
-    "no_refusal": "Exclude Refusal",
-}
-cat_name_to_explanation = {
-    "Overall": "Overall Questions",
-    "Coding": "Coding: whether conversation contains code snippets",
-    "Longer Query": "Longer Query (>= 500 tokens)",
-    "English": "English Prompts",
-    "Chinese": "Chinese Prompts",
-    "French": "French Prompts",
-    "Exclude Ties": "Exclude Ties and Bothbad",
-    "Exclude Short Query (< 5 tokens)": "Exclude Short User Query (< 5 tokens)",
-    "Exclude Refusal": 'Exclude model responses with refusal (e.g., "I cannot answer")',
-}
-
-
 def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=False):
-    arena_dfs = {}
-    category_elo_results = {}
     if elo_results_file is None:  # Do live update
         default_md = "Loading ..."
         p1 = p2 = p3 = p4 = None
     else:
         with open(elo_results_file, "rb") as fin:
             elo_results = pickle.load(fin)
-            if "full" in elo_results:
-                for k in key_to_category_name.keys():
-                    if k not in elo_results:
-                        continue
-                    arena_dfs[key_to_category_name[k]] = elo_results[k][
-                        "leaderboard_table_df"
-                    ]
-                    category_elo_results[key_to_category_name[k]] = elo_results[k]
 
-        p1 = category_elo_results["Overall"]["win_fraction_heatmap"]
-        p2 = category_elo_results["Overall"]["battle_count_heatmap"]
-        p3 = category_elo_results["Overall"]["bootstrap_elo_rating"]
-        p4 = category_elo_results["Overall"]["average_win_rate_bar"]
-        arena_df = arena_dfs["Overall"]
-        default_md = make_default_md(arena_df, category_elo_results["Overall"])
+        p1 = elo_results["win_fraction_heatmap"]
+        p2 = elo_results["battle_count_heatmap"]
+        p3 = elo_results["bootstrap_elo_rating"]
+        p4 = elo_results["average_win_rate_bar"]
+        arena_df = elo_results["leaderboard_table_df"]
+        default_md = make_default_md(arena_df, elo_results)
 
     md_1 = gr.Markdown(default_md, elem_id="leaderboard_markdown")
     if leaderboard_table_file:
@@ -416,33 +288,18 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
         with gr.Tabs() as tabs:
             # arena table
             arena_table_vals = get_arena_table(arena_df, model_table_df)
-            with gr.Tab("競技場 Elo", id=0):
+            with gr.Tab("Arena Elo", id=0):
                 md = make_arena_leaderboard_md(arena_df)
                 gr.Markdown(md, elem_id="leaderboard_markdown")
-                with gr.Row():
-                    with gr.Column(scale=2):
-                        category_dropdown = gr.Dropdown(
-                            choices=list(arena_dfs.keys()),
-                            label="Category",
-                            value="Overall",
-                        )
-                    default_category_details = make_category_arena_leaderboard_md(
-                        arena_df, arena_df, name="Overall"
-                    )
-                    with gr.Column(scale=4, variant="panel"):
-                        category_deets = gr.Markdown(
-                            default_category_details, elem_id="category_deets"
-                        )
-
-                elo_display_df = gr.Dataframe(
+                gr.Dataframe(
                     headers=[
-                        "排名",
-                        "🤖 模型",
-                        "⭐ 競技場Elo",
-                        "📊 95%信賴區間",
-                        "🗳️ 投票數",
-                        "組織",
-                        "授權",
+                        "Rank",
+                        "🤖 Model",
+                        "⭐ Arena Elo",
+                        "📊 95% CI",
+                        "🗳️ Votes",
+                        "Organization",
+                        "License",
                     ],
                     datatype=[
                         "str",
@@ -452,67 +309,25 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
                         "number",
                         "str",
                         "str",
-                        "str",
                     ],
                     value=arena_table_vals,
                     elem_id="arena_leaderboard_dataframe",
                     height=700,
-                    column_widths=[70, 190, 100, 100, 90, 130, 150, 100],
+                    column_widths=[50, 200, 100, 100, 100, 150, 150],
                     wrap=True,
                 )
-                gr.Markdown(
-                    f"""Note: in each category, we exclude models with fewer than 500 votes as their confidence intervals can be large.""",
-                    elem_id="leaderboard_markdown",
-                )
-
-                leader_component_values[:] = [default_md, p1, p2, p3, p4]
-
-                if show_plot:
-                    more_stats_md = gr.Markdown(
-                        f"""## More Statistics for Chatbot Arena (Overall)""",
-                        elem_id="leaderboard_header_markdown",
-                    )
-                    with gr.Row():
-                        with gr.Column():
-                            gr.Markdown(
-                                "#### Figure 1: Fraction of Model A Wins for All Non-tied A vs. B Battles",
-                                elem_id="plot-title",
-                            )
-                            plot_1 = gr.Plot(
-                                p1, show_label=False, elem_id="plot-container"
-                            )
-                        with gr.Column():
-                            gr.Markdown(
-                                "#### Figure 2: Battle Count for Each Combination of Models (without Ties)",
-                                elem_id="plot-title",
-                            )
-                            plot_2 = gr.Plot(p2, show_label=False)
-                    with gr.Row():
-                        with gr.Column():
-                            gr.Markdown(
-                                "#### Figure 3: Confidence Intervals on Model Strength (via Bootstrapping)",
-                                elem_id="plot-title",
-                            )
-                            plot_3 = gr.Plot(p3, show_label=False)
-                        with gr.Column():
-                            gr.Markdown(
-                                "#### Figure 4: Average Win Rate Against All Other Models (Assuming Uniform Sampling and No Ties)",
-                                elem_id="plot-title",
-                            )
-                            plot_4 = gr.Plot(p4, show_label=False)
-
             with gr.Tab("Full Leaderboard", id=1):
                 md = make_full_leaderboard_md(elo_results)
                 gr.Markdown(md, elem_id="leaderboard_markdown")
                 full_table_vals = get_full_table(arena_df, model_table_df)
                 gr.Dataframe(
                     headers=[
-                        "🤖 模型",
-                        "⭐ 競技場Elo",
-                        "📈 Taiwan-bench",
-                        "📚 TMMLU+",
-                        "組織",
-                        "授權",
+                        "🤖 Model",
+                        "⭐ Arena Elo",
+                        "📈 MT-bench",
+                        "📚 MMLU",
+                        "Organization",
+                        "License",
                     ],
                     datatype=["markdown", "number", "number", "number", "str", "str"],
                     value=full_table_vals,
@@ -523,7 +338,7 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
                 )
         if not show_plot:
             gr.Markdown(
-                """ ## Visit our [HF space](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard) for more analysis!
+                """ ## Visit our&nbsp;[HF space](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard)&nbsp;for more analysis!
                 If you want to see more models, please help us [add them](https://github.com/lm-sys/FastChat/blob/main/docs/arena.md#how-to-add-a-new-model).
                 """,
                 elem_id="leaderboard_markdown",
@@ -531,164 +346,36 @@ def build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=Fa
     else:
         pass
 
-    def update_leaderboard_df(arena_table_vals):
-        elo_datarame = pd.DataFrame(
-            arena_table_vals,
-            columns=[
-                "Rank* (UB)",
-                "Delta",
-                "🤖 Model",
-                "⭐ Arena Elo",
-                "📊 95% CI",
-                "🗳️ Votes",
-                "Organization",
-                "License",
-                "Knowledge Cutoff",
-            ],
+    leader_component_values[:] = [default_md, p1, p2, p3, p4]
+
+    if show_plot:
+        gr.Markdown(
+            f"""## More Statistics for Chatbot Arena\n
+Below are figures for more statistics. The code for generating them is also included in this [notebook]({notebook_url}).
+You can find more discussions in this blog [post](https://lmsys.org/blog/2023-12-07-leaderboard/).
+    """,
+            elem_id="leaderboard_markdown",
         )
-
-        # goal: color the rows based on the rank with styler
-        def highlight_max(s):
-            # all items in S which contain up arrow should be green, down arrow should be red, otherwise black
-            return [
-                "color: green; font-weight: bold"
-                if "\u2191" in v
-                else "color: red; font-weight: bold"
-                if "\u2193" in v
-                else ""
-                for v in s
-            ]
-
-        def highlight_rank_max(s):
-            return [
-                "color: green; font-weight: bold"
-                if v > 0
-                else "color: red; font-weight: bold"
-                if v < 0
-                else ""
-                for v in s
-            ]
-
-        return elo_datarame.style.apply(highlight_max, subset=["Rank* (UB)"]).apply(
-            highlight_rank_max, subset=["Delta"]
+        gr.Markdown(
+            "#### Figure 1: Fraction of Model A Wins for All Non-tied A vs. B Battles"
         )
-
-    def update_leaderboard_and_plots(category):
-        arena_subset_df = arena_dfs[category]
-        arena_subset_df = arena_subset_df[arena_subset_df["num_battles"] > 500]
-        elo_subset_results = category_elo_results[category]
-        arena_df = arena_dfs["Overall"]
-        arena_values = get_arena_table(
-            arena_df,
-            model_table_df,
-            arena_subset_df=arena_subset_df if category != "Overall" else None,
+        plot_1 = gr.Plot(p1, show_label=False)
+        gr.Markdown(
+            "#### Figure 2: Battle Count for Each Combination of Models (without Ties)"
         )
-        if category != "Overall":
-            arena_values = update_leaderboard_df(arena_values)
-            arena_values = gr.Dataframe(
-                headers=[
-                    "Rank* (UB)",
-                    "Delta",
-                    "🤖 Model",
-                    "⭐ Arena Elo",
-                    "📊 95% CI",
-                    "🗳️ Votes",
-                    "Organization",
-                    "License",
-                    "Knowledge Cutoff",
-                ],
-                datatype=[
-                    "number",
-                    "number",
-                    "markdown",
-                    "number",
-                    "str",
-                    "number",
-                    "str",
-                    "str",
-                    "str",
-                ],
-                value=arena_values,
-                elem_id="arena_leaderboard_dataframe",
-                height=700,
-                column_widths=[70, 70, 200, 90, 100, 90, 120, 150, 100],
-                wrap=True,
-            )
-        else:
-            arena_values = gr.Dataframe(
-                headers=[
-                    "Rank* (UB)",
-                    "🤖 Model",
-                    "⭐ Arena Elo",
-                    "📊 95% CI",
-                    "🗳️ Votes",
-                    "Organization",
-                    "License",
-                    "Knowledge Cutoff",
-                ],
-                datatype=[
-                    "number",
-                    "markdown",
-                    "number",
-                    "str",
-                    "number",
-                    "str",
-                    "str",
-                    "str",
-                ],
-                value=arena_values,
-                elem_id="arena_leaderboard_dataframe",
-                height=700,
-                column_widths=[70, 190, 100, 100, 90, 140, 150, 100],
-                wrap=True,
-            )
-
-        p1 = elo_subset_results["win_fraction_heatmap"]
-        p2 = elo_subset_results["battle_count_heatmap"]
-        p3 = elo_subset_results["bootstrap_elo_rating"]
-        p4 = elo_subset_results["average_win_rate_bar"]
-        more_stats_md = f"""## More Statistics for Chatbot Arena - {category}
-        """
-        leaderboard_md = make_category_arena_leaderboard_md(
-            arena_df, arena_subset_df, name=category
+        plot_2 = gr.Plot(p2, show_label=False)
+        gr.Markdown(
+            "#### Figure 3: Bootstrap of Elo Estimates (1000 Rounds of Random Sampling)"
         )
-        return arena_values, p1, p2, p3, p4, more_stats_md, leaderboard_md
-
-    category_dropdown.change(
-        update_leaderboard_and_plots,
-        inputs=[category_dropdown],
-        outputs=[
-            elo_display_df,
-            plot_1,
-            plot_2,
-            plot_3,
-            plot_4,
-            more_stats_md,
-            category_deets,
-        ],
-    )
+        plot_3 = gr.Plot(p3, show_label=False)
+        gr.Markdown(
+            "#### Figure 4: Average Win Rate Against All Other Models (Assuming Uniform Sampling and No Ties)"
+        )
+        plot_4 = gr.Plot(p4, show_label=False)
 
     from fastchat.serve.gradio_web_server import acknowledgment_md
 
-    with gr.Accordion(
-        "📝 Citation",
-        open=True,
-    ):
-        citation_md = """
-            ### Citation
-            Please cite the following paper if you find our leaderboard or dataset helpful.
-            ```
-            @misc{chiang2024chatbot,
-                title={Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference},
-                author={Wei-Lin Chiang and Lianmin Zheng and Ying Sheng and Anastasios Nikolas Angelopoulos and Tianle Li and Dacheng Li and Hao Zhang and Banghua Zhu and Michael Jordan and Joseph E. Gonzalez and Ion Stoica},
-                year={2024},
-                eprint={2403.04132},
-                archivePrefix={arXiv},
-                primaryClass={cs.AI}
-            }
-            """
-        gr.Markdown(citation_md, elem_id="leaderboard_markdown")
-        gr.Markdown(acknowledgment_md, elem_id="ack_markdown")
+    gr.Markdown(acknowledgment_md, elem_id="ack_markdown")
 
     if show_plot:
         return [md_1, plot_1, plot_2, plot_3, plot_4]
@@ -699,27 +386,23 @@ def build_demo(elo_results_file, leaderboard_table_file):
     from fastchat.serve.gradio_web_server import block_css
 
     text_size = gr.themes.sizes.text_lg
-    theme = gr.themes.Base(text_size=text_size)
-    theme.set(
-        button_secondary_background_fill_hover="*primary_300",
-        button_secondary_background_fill_hover_dark="*primary_700",
-    )
 
     with gr.Blocks(
-        title="Chatbot Arena Leaderboard",
-        theme=gr.themes.Default(text_size=text_size),
+        title="Monitor",
+        theme=gr.themes.Base(text_size=text_size),
         css=block_css,
     ) as demo:
         with gr.Tabs() as tabs:
-            with gr.Tab("排行榜", id=0):
+            with gr.Tab("Leaderboard", id=0):
                 leader_components = build_leaderboard_tab(
                     elo_results_file,
                     leaderboard_table_file,
                     show_plot=True,
                 )
 
-            with gr.Tab("基本統計", id=1):
+            with gr.Tab("Basic Stats", id=1):
                 basic_components = build_basic_stats_tab()
+
         url_params = gr.JSON(visible=False)
         demo.load(
             load_demo,
@@ -767,8 +450,5 @@ if __name__ == "__main__":
         status_update_rate=10,
         api_open=False,
     ).launch(
-        server_name=args.host,
-        server_port=args.port,
-        share=args.share,
-        max_threads=200,
+        server_name=args.host, server_port=args.port, share=args.share, max_threads=200
     )
